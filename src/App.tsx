@@ -82,6 +82,13 @@ const SpotlightMarquee = ({ spotlightTopics, onSelect }: { spotlightTopics: Topi
   );
 };
 
+const lightPageRoot = 'flex flex-col h-full bg-[radial-gradient(circle_at_top,#fffaf4_0%,#f7f2ea_42%,#f2ebe1_100%)] text-[#2f261d]';
+const lightPageRootPadded = `${lightPageRoot} pt-8`;
+const lightHeaderShell = 'p-6 flex items-center justify-between sticky top-0 bg-[#f9f5ef]/90 backdrop-blur-xl z-20 border-b border-[#e8dfd2]';
+const lightIconButton = 'w-10 h-10 rounded-2xl flex items-center justify-center border border-[#e9dfd3] bg-white/80 text-[#4f3d2d] shadow-sm active:scale-95 transition-transform';
+const lightSurfaceCard = 'rounded-[32px] border border-[#ece3d7] bg-white/82 shadow-[0_18px_40px_rgba(103,81,58,0.06)] backdrop-blur-xl';
+const lightInputField = 'bg-white/82 border border-[#eadfce] text-[#2f261d] placeholder:text-[#baa897]';
+
 const BottomNav = ({ active, setScreen, onPlusClick }: { 
   active: Screen, 
   setScreen: (s: Screen) => void, 
@@ -1720,9 +1727,9 @@ const NetworkListScreen = ({
   const filteredUsers = filteredByTab.filter(u => u.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
-    <div className="flex flex-col h-full bg-dark pt-8">
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-dark/80 backdrop-blur-xl z-20 border-b border-white/[0.03]">
-        <button onClick={() => setScreen(prevScreen)} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center">
+    <div className={lightPageRootPadded}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen(prevScreen)} className={lightIconButton}>
           <ArrowLeft size={20} />
         </button>
         <div className="flex gap-4">
@@ -1734,11 +1741,11 @@ const NetworkListScreen = ({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`text-sm font-bold relative pb-1 transition-colors ${activeTab === tab.id ? 'text-white' : 'text-white/30'}`}
+              className={`text-sm font-bold relative pb-1 transition-colors ${activeTab === tab.id ? 'text-[#2f261d]' : 'text-[#b0a08e]'}`}
             >
               {tab.label}
               {activeTab === tab.id && (
-                <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold rounded-full" />
+                <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#FE2C55] rounded-full" />
               )}
             </button>
           ))}
@@ -1749,13 +1756,13 @@ const NetworkListScreen = ({
       <main className="flex-1 overflow-y-auto no-scrollbar pb-10">
         <div className="p-6">
           <div className="relative group mb-6">
-            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-gold transition-colors" />
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#b0a08e] group-focus-within:text-[#FE2C55] transition-colors" />
             <input
               type="text"
               placeholder="搜索用户..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-12 bg-white/5 border border-white/5 rounded-2xl pl-12 pr-4 text-sm font-medium outline-none focus:border-white/20 focus:bg-white/10 transition-all text-white"
+              className={`w-full h-12 rounded-2xl pl-12 pr-4 text-sm font-medium outline-none focus:border-[#FE2C55]/20 transition-all ${lightInputField}`}
             />
           </div>
 
@@ -1763,18 +1770,18 @@ const NetworkListScreen = ({
             {filteredUsers.map(user => (
               <div 
                 key={user.id} 
-                className="flex items-center gap-4 bg-white/[0.02] border border-white/5 p-4 rounded-[28px] active:bg-white/5 transition-all group"
+                className={`flex items-center gap-4 p-4 active:bg-[#faf4ec] transition-all group ${lightSurfaceCard}`}
                 onClick={() => setScreen('user-profile')}
               >
-                <img src={user.avatar} alt="" className="w-12 h-12 rounded-2xl border border-white/10 object-cover" />
+                <img src={user.avatar} alt="" className="w-12 h-12 rounded-2xl border border-[#eadfce] object-cover" />
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-bold text-white text-sm truncate">{user.name}</h4>
-                  <p className="text-[10px] text-white/30 mt-1 truncate tracking-wide">{user.bio}</p>
+                  <h4 className="font-bold text-[#2f261d] text-sm truncate">{user.name}</h4>
+                  <p className="text-[10px] text-[#8f7f6d] mt-1 truncate tracking-wide">{user.bio}</p>
                 </div>
                 <button 
                   onClick={(e) => { e.stopPropagation(); }}
                   className={`px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                    user.isFollowing ? 'bg-white/5 text-white/40 border border-white/5' : 'bg-white text-dark shadow-lg'
+                    user.isFollowing ? 'bg-[#f6ede3] text-[#8f7f6d] border border-[#eadfce]' : 'bg-[#FE2C55] text-white shadow-[0_10px_24px_rgba(254,44,85,0.18)]'
                   }`}
                 >
                   {user.isFollowing && user.followsMe ? '互相关注' : user.isFollowing ? '已关注' : '关注'}
@@ -1783,10 +1790,10 @@ const NetworkListScreen = ({
             ))}
             {filteredUsers.length === 0 && (
               <div className="py-20 text-center space-y-4 opacity-50">
-                <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto text-white/10">
+                <div className="w-16 h-16 bg-white/82 rounded-full flex items-center justify-center mx-auto text-[#d7c6b2] border border-[#eadfce]">
                   <UserIcon size={32} />
                 </div>
-                <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.2em]">暂无相关成果</p>
+                <p className="text-[10px] text-[#b0a08e] font-black uppercase tracking-[0.2em]">暂无相关成果</p>
               </div>
             )}
           </div>
@@ -2082,10 +2089,10 @@ const FriendsScreen = ({ setScreen, setSelectedUserName, initialTab = 'friends' 
       return (
         <>
           <div className="px-6 mb-6">
-            <div className="p-6 bg-gradient-to-br from-green-500/20 to-dark bento-card border border-green-500/10 space-y-3">
-              <p className="text-xs font-black uppercase text-green-400 tracking-widest">好友定义</p>
-              <h3 className="text-xl font-bold leading-tight">互相关注的人，就是好友。</h3>
-              <p className="text-white/40 text-xs leading-relaxed">好友可直接发起私信，也可以在共创召集中作为第一顺位被邀请。</p>
+            <div className="p-6 bg-gradient-to-br from-[#eef8f1] to-[#fffaf5] rounded-[32px] border border-[#d8eadf] space-y-3 shadow-[0_18px_40px_rgba(103,81,58,0.06)]">
+              <p className="text-xs font-black uppercase text-emerald-500 tracking-widest">好友定义</p>
+              <h3 className="text-xl font-bold leading-tight text-[#2f261d]">互相关注的人，就是好友。</h3>
+              <p className="text-[#8f7f6d] text-xs leading-relaxed">好友可直接发起私信，也可以在共创召集中作为第一顺位被邀请。</p>
             </div>
           </div>
           {renderUserList(filteredUsers)}
@@ -2097,27 +2104,27 @@ const FriendsScreen = ({ setScreen, setSelectedUserName, initialTab = 'friends' 
 
 
   return (
-    <div className="flex flex-col h-full bg-dark pt-8">
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-dark/80 backdrop-blur-xl z-20">
-        <button onClick={() => setScreen('me')} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center">
-          <ArrowLeft size={20} className="text-white" />
+    <div className={lightPageRootPadded}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen('me')} className={lightIconButton}>
+          <ArrowLeft size={20} />
         </button>
         <div className="flex gap-4">
           <button 
             onClick={() => setActiveTab('friends')}
-            className={`font-bold transition-colors ${activeTab === 'friends' ? 'text-white' : 'text-white/40'}`}
+            className={`font-bold transition-colors ${activeTab === 'friends' ? 'text-[#2f261d]' : 'text-[#b0a08e]'}`}
           >
             好友
           </button>
           <button 
             onClick={() => setActiveTab('following')}
-            className={`font-bold transition-colors ${activeTab === 'following' ? 'text-white' : 'text-white/40'}`}
+            className={`font-bold transition-colors ${activeTab === 'following' ? 'text-[#2f261d]' : 'text-[#b0a08e]'}`}
           >
             关注
           </button>
           <button 
             onClick={() => setActiveTab('followers')}
-            className={`font-bold transition-colors ${activeTab === 'followers' ? 'text-white' : 'text-white/40'}`}
+            className={`font-bold transition-colors ${activeTab === 'followers' ? 'text-[#2f261d]' : 'text-[#b0a08e]'}`}
           >
             粉丝
           </button>
@@ -2136,12 +2143,12 @@ const FriendsScreen = ({ setScreen, setSelectedUserName, initialTab = 'friends' 
 
 const SettingsScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
   return (
-    <div className="flex flex-col h-full bg-dark pt-8 overflow-y-auto no-scrollbar pb-10">
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-dark/80 backdrop-blur-xl z-20">
-        <button onClick={() => setScreen('me')} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center border border-white/5">
-          <ArrowLeft size={20} className="text-white" />
+    <div className={`${lightPageRootPadded} overflow-y-auto no-scrollbar pb-10`}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen('me')} className={lightIconButton}>
+          <ArrowLeft size={20} />
         </button>
-        <h2 className="font-bold text-white">系统设置</h2>
+        <h2 className="font-bold text-[#2f261d]">系统设置</h2>
         <div className="w-10 h-10"></div>
       </header>
 
@@ -2155,21 +2162,21 @@ const SettingsScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
           <div 
             key={item.label} 
             onClick={() => setScreen(item.screen as any)}
-            className="p-4 bg-card bento-card border border-white/5 flex items-center gap-4 active:bg-white/5 transition-colors cursor-pointer"
+            className={`p-4 flex items-center gap-4 active:bg-[#faf4ec] transition-colors cursor-pointer ${lightSurfaceCard}`}
           >
-             <div className="w-10 h-10 glass-pill rounded-xl flex items-center justify-center text-white/60">
+             <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[#8f7f6d] bg-[#f6ede3] border border-[#eadfce]">
                 <item.icon size={20} />
              </div>
              <div className="flex-1">
-                <p className="text-sm font-bold text-white">{item.label}</p>
-                <p className="text-[10px] text-white/40 font-black uppercase tracking-widest mt-0.5">{item.desc}</p>
+                <p className="text-sm font-bold text-[#2f261d]">{item.label}</p>
+                <p className="text-[10px] text-[#8f7f6d] font-black uppercase tracking-widest mt-0.5">{item.desc}</p>
              </div>
-             <ChevronRight size={16} className="text-white/10" />
+             <ChevronRight size={16} className="text-[#c0b09d]" />
           </div>
         ))}
 
         <div className="pt-8">
-           <button onClick={() => setScreen('login')} className="w-full h-14 glass-pill rounded-2xl text-rose-400 font-bold text-sm active:scale-95 transition-transform uppercase tracking-widest border border-rose-500/10">
+           <button onClick={() => setScreen('login')} className="w-full h-14 rounded-2xl text-rose-500 font-bold text-sm active:scale-95 transition-transform uppercase tracking-widest border border-rose-200 bg-white/82 shadow-sm">
               退出当前账号
            </button>
         </div>
@@ -2180,20 +2187,20 @@ const SettingsScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
 
 const AccountProfileScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
   return (
-    <div className="flex flex-col h-full bg-dark pt-8">
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-dark/80 backdrop-blur-xl z-20 border-b border-white/[0.03]">
-        <button onClick={() => setScreen('settings')} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center border border-white/5 shadow-sm active:scale-95 transition-transform">
-          <ArrowLeft size={20} className="text-white" />
+    <div className={lightPageRootPadded}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen('settings')} className={lightIconButton}>
+          <ArrowLeft size={20} />
         </button>
-        <h2 className="font-bold text-white text-lg tracking-tight">帐号资料</h2>
+        <h2 className="font-bold text-[#2f261d] text-lg tracking-tight">帐号资料</h2>
         <div className="w-10"></div>
       </header>
 
       <main className="flex-1 overflow-y-auto no-scrollbar px-6 py-4">
         <div className="flex flex-col items-center mt-6 mb-8">
-          <div className="w-24 h-24 rounded-[32px] bg-white/5 flex items-center justify-center border-4 border-white/5 relative">
-            <UserIcon size={40} className="text-white/40" />
-            <button className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center border-2 border-dark active:scale-95 transition-transform border-white/10 shadow-lg">
+          <div className="w-24 h-24 rounded-[32px] bg-white/82 flex items-center justify-center border-4 border-white relative shadow-lg">
+            <UserIcon size={40} className="text-[#c8b8a7]" />
+            <button className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-[#FE2C55] flex items-center justify-center border-2 border-white active:scale-95 transition-transform shadow-lg">
               <Camera size={14} className="text-white" />
             </button>
           </div>
@@ -2201,26 +2208,26 @@ const AccountProfileScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
         
         <div className="space-y-4">
           <div className="space-y-1">
-            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-4">昵称</label>
-            <div className="w-full px-4 py-4 rounded-3xl bg-white/5 border border-white/10 text-white font-bold flex justify-between items-center">
+            <label className="text-[10px] font-black text-[#b0a08e] uppercase tracking-widest pl-4">昵称</label>
+            <div className={`w-full px-4 py-4 rounded-3xl text-[#2f261d] font-bold flex justify-between items-center ${lightSurfaceCard}`}>
               <span>{CURRENT_USER.name}</span>
-              <ChevronRight size={16} className="text-white/20" />
+              <ChevronRight size={16} className="text-[#c0b09d]" />
             </div>
           </div>
           
           <div className="space-y-1">
-            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-4">简介</label>
-            <div className="w-full px-4 py-4 rounded-3xl bg-white/5 border border-white/10 text-white font-bold flex justify-between items-center">
-              <span className="text-white/60 text-sm truncate">添加简介，让大家更好认识你</span>
-              <ChevronRight size={16} className="text-white/20" />
+            <label className="text-[10px] font-black text-[#b0a08e] uppercase tracking-widest pl-4">简介</label>
+            <div className={`w-full px-4 py-4 rounded-3xl text-[#2f261d] font-bold flex justify-between items-center ${lightSurfaceCard}`}>
+              <span className="text-[#8f7f6d] text-sm truncate">添加简介，让大家更好认识你</span>
+              <ChevronRight size={16} className="text-[#c0b09d]" />
             </div>
           </div>
           
           <div className="space-y-1">
-            <label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-4">性别</label>
-            <div className="w-full px-4 py-4 rounded-3xl bg-white/5 border border-white/10 text-white font-bold flex justify-between items-center">
-              <span className="text-white/60 text-sm">不公开</span>
-              <ChevronRight size={16} className="text-white/20" />
+            <label className="text-[10px] font-black text-[#b0a08e] uppercase tracking-widest pl-4">性别</label>
+            <div className={`w-full px-4 py-4 rounded-3xl text-[#2f261d] font-bold flex justify-between items-center ${lightSurfaceCard}`}>
+              <span className="text-[#8f7f6d] text-sm">不公开</span>
+              <ChevronRight size={16} className="text-[#c0b09d]" />
             </div>
           </div>
         </div>
@@ -2231,29 +2238,29 @@ const AccountProfileScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
 
 const PrivacyPolicyScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
   return (
-    <div className="flex flex-col h-full bg-dark pt-8">
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-dark/80 backdrop-blur-xl z-20 border-b border-white/[0.03]">
-        <button onClick={() => setScreen('settings')} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center border border-white/5 shadow-sm active:scale-95 transition-transform">
-          <ArrowLeft size={20} className="text-white" />
+    <div className={lightPageRootPadded}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen('settings')} className={lightIconButton}>
+          <ArrowLeft size={20} />
         </button>
-        <h2 className="font-bold text-white text-lg tracking-tight">隐私政策</h2>
+        <h2 className="font-bold text-[#2f261d] text-lg tracking-tight">隐私政策</h2>
         <div className="w-10"></div>
       </header>
 
-      <main className="flex-1 overflow-y-auto no-scrollbar px-6 py-6 space-y-6 text-white/80 text-sm leading-relaxed">
-        <h3 className="text-xl font-bold text-white">Dream Record 隐私保护指引</h3>
+      <main className="flex-1 overflow-y-auto no-scrollbar px-6 py-6 space-y-6 text-[#6f6256] text-sm leading-relaxed">
+        <h3 className="text-xl font-bold text-[#2f261d]">Dream Record 隐私保护指引</h3>
         <p>本指引旨在帮助你了解我们如何收集、使用、存储及分享你的个人信息，以及你如何管理这些信息。</p>
         
-        <h4 className="font-bold text-white text-base">1. 我们收集的信息</h4>
+        <h4 className="font-bold text-[#2f261d] text-base">1. 我们收集的信息</h4>
         <p>当你使用本应用时，为了提供基本服务，我们可能会收集你的设备信息、网络信息、使用日志等数据。</p>
         
-        <h4 className="font-bold text-white text-base">2. 信息的存储</h4>
+        <h4 className="font-bold text-[#2f261d] text-base">2. 信息的存储</h4>
         <p>我们承诺将你的信息存储在安全可靠的环境中，采用加密等技术措施保护数据安全。</p>
         
-        <h4 className="font-bold text-white text-base">3. 信息的使用</h4>
+        <h4 className="font-bold text-[#2f261d] text-base">3. 信息的使用</h4>
         <p>收集的信息将专门用于持续优化产品体验、为你推荐个性化内容等，绝不出售给任何第三方。</p>
         
-        <h4 className="font-bold text-white text-base">4. 你的权利</h4>
+        <h4 className="font-bold text-[#2f261d] text-base">4. 你的权利</h4>
         <p>你有权随时查询、更正或要求删除你的个人信息，也可以在账号设置中管理各类隐私权限选项。</p>
       </main>
     </div>
@@ -2262,43 +2269,43 @@ const PrivacyPolicyScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) 
 
 const NotificationSettingsScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
   return (
-    <div className="flex flex-col h-full bg-dark pt-8">
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-dark/80 backdrop-blur-xl z-20 border-b border-white/[0.03]">
-        <button onClick={() => setScreen('settings')} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center border border-white/5 shadow-sm active:scale-95 transition-transform">
-          <ArrowLeft size={20} className="text-white" />
+    <div className={lightPageRootPadded}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen('settings')} className={lightIconButton}>
+          <ArrowLeft size={20} />
         </button>
-        <h2 className="font-bold text-white text-lg tracking-tight">通知设置</h2>
+        <h2 className="font-bold text-[#2f261d] text-lg tracking-tight">通知设置</h2>
         <div className="w-10"></div>
       </header>
 
       <main className="flex-1 overflow-y-auto no-scrollbar px-6 py-4">
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-5 rounded-3xl bg-white/5 border border-white/10">
+          <div className={`flex items-center justify-between p-5 rounded-3xl ${lightSurfaceCard}`}>
             <div>
-              <p className="text-base font-bold text-white mb-0.5">消息通知</p>
-              <p className="text-[10px] text-white/40">接收私信、群聊等即时消息</p>
+              <p className="text-base font-bold text-[#2f261d] mb-0.5">消息通知</p>
+              <p className="text-[10px] text-[#8f7f6d]">接收私信、群聊等即时消息</p>
             </div>
-            <div className="w-12 h-6 rounded-full bg-indigo-600 flex items-center px-1">
+            <div className="w-12 h-6 rounded-full bg-[#FE2C55] flex items-center px-1">
               <div className="w-4 h-4 rounded-full bg-white translate-x-6" />
             </div>
           </div>
           
-          <div className="flex items-center justify-between p-5 rounded-3xl bg-white/5 border border-white/10">
+          <div className={`flex items-center justify-between p-5 rounded-3xl ${lightSurfaceCard}`}>
             <div>
-              <p className="text-base font-bold text-white mb-0.5">互动通知</p>
-              <p className="text-[10px] text-white/40">有点赞、评论、关注时提醒我</p>
+              <p className="text-base font-bold text-[#2f261d] mb-0.5">互动通知</p>
+              <p className="text-[10px] text-[#8f7f6d]">有点赞、评论、关注时提醒我</p>
             </div>
-            <div className="w-12 h-6 rounded-full bg-white/20 flex items-center px-1">
-              <div className="w-4 h-4 rounded-full bg-white" />
+            <div className="w-12 h-6 rounded-full bg-[#eadfce] flex items-center px-1">
+              <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
             </div>
           </div>
           
-          <div className="flex items-center justify-between p-5 rounded-3xl bg-white/5 border border-white/10">
+          <div className={`flex items-center justify-between p-5 rounded-3xl ${lightSurfaceCard}`}>
             <div>
-              <p className="text-base font-bold text-white mb-0.5">系统公告</p>
-              <p className="text-[10px] text-white/40">接收应用更新与重要活动通知</p>
+              <p className="text-base font-bold text-[#2f261d] mb-0.5">系统公告</p>
+              <p className="text-[10px] text-[#8f7f6d]">接收应用更新与重要活动通知</p>
             </div>
-            <div className="w-12 h-6 rounded-full bg-indigo-600 flex items-center px-1">
+            <div className="w-12 h-6 rounded-full bg-[#FE2C55] flex items-center px-1">
               <div className="w-4 h-4 rounded-full bg-white translate-x-6" />
             </div>
           </div>
@@ -2322,22 +2329,22 @@ const TopicCollectionScreen = ({ setScreen, topicsList, setSelectedTopic, topicI
   const topics = topicsList.filter(t => topicIds.has(t.id));
 
   return (
-    <div className="flex flex-col h-full bg-dark pt-8">
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-dark/80 backdrop-blur-xl z-20">
-        <button onClick={() => setScreen('me')} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center border border-white/5">
-          <ArrowLeft size={20} className="text-white" />
+    <div className={lightPageRootPadded}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen('me')} className={lightIconButton}>
+          <ArrowLeft size={20} />
         </button>
-        <h2 className="font-bold text-white">{title}</h2>
+        <h2 className="font-bold text-[#2f261d]">{title}</h2>
         <div className="w-10 h-10"></div>
       </header>
 
       <main className="flex-1 p-6 overflow-y-auto no-scrollbar pb-6">
         {topics.length === 0 ? (
           <div className="py-20 text-center space-y-4">
-             <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto text-white/20">
+             <div className="w-16 h-16 bg-white/82 rounded-full flex items-center justify-center mx-auto text-[#d7c6b2] border border-[#eadfce]">
                 {emptyIcon}
              </div>
-             <p className="text-white/20 font-black uppercase text-xs tracking-widest">{emptyText}</p>
+             <p className="text-[#b0a08e] font-black uppercase text-xs tracking-widest">{emptyText}</p>
           </div>
         ) : (
           <div className="columns-2 gap-4 space-y-4">
@@ -2349,29 +2356,29 @@ const TopicCollectionScreen = ({ setScreen, topicsList, setSelectedTopic, topicI
                     setSelectedTopic(topic);
                     setScreen('topic-detail');
                   }}
-                  className="break-inside-avoid bento-card p-4 space-y-3 bg-card shadow-lg cursor-pointer"
+                  className={`break-inside-avoid p-4 space-y-3 shadow-lg cursor-pointer ${lightSurfaceCard}`}
                 >
-                   <div className={`aspect-[3/4] rounded-2xl bg-gradient-to-br from-indigo-500/10 to-dark relative overflow-hidden ${
-                     topic.tone === 'amber' ? 'from-amber-500/20' : 
-                     topic.tone === 'green' ? 'from-green-500/20' : 'from-blue-500/20'
+                   <div className={`aspect-[3/4] rounded-2xl bg-gradient-to-br relative overflow-hidden ${
+                     topic.tone === 'amber' ? 'from-[#fff2df] to-[#f6ede3]' : 
+                     topic.tone === 'green' ? 'from-[#eef8f1] to-[#f6ede3]' : 'from-[#eef3fb] to-[#f6ede3]'
                    }`}>
-                      <div className="absolute inset-0 flex items-center justify-center opacity-10">
-                        <Users size={48} className="text-white" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-15">
+                        <Users size={48} className="text-[#bcae9d]" />
                       </div>
                       {topic.status === 'completed' ? (
-                        <div className="absolute top-2 right-2 bg-green-500/10 px-2 py-0.5 rounded text-[8px] font-black uppercase text-green-600">
+                        <div className="absolute top-2 right-2 bg-emerald-100 px-2 py-0.5 rounded text-[8px] font-black uppercase text-emerald-600">
                           {topic.joinedCount}人共创
                         </div>
                       ) : (
-                        <div className="absolute top-2 right-2 bg-gold/10 px-2 py-0.5 rounded text-[8px] font-black uppercase text-gold">
+                        <div className="absolute top-2 right-2 bg-[#fff1dc] px-2 py-0.5 rounded text-[8px] font-black uppercase text-[#b4834a]">
                           待成圈
                         </div>
                       )}
                    </div>
                    <div className="space-y-1">
-                     <h4 className="text-sm font-bold line-clamp-2 leading-tight text-white">{topic.title}</h4>
+                     <h4 className="text-sm font-bold line-clamp-2 leading-tight text-[#2f261d]">{topic.title}</h4>
                      {topic.status !== 'completed' && (
-                       <p className="text-[9px] font-black text-gold/80 uppercase tracking-tight">
+                       <p className="text-[9px] font-black text-[#b4834a] uppercase tracking-tight">
                          还需 {topic.targetCount - topic.joinedCount} 人成圈
                        </p>
                      )}
@@ -2379,18 +2386,18 @@ const TopicCollectionScreen = ({ setScreen, topicsList, setSelectedTopic, topicI
                          <div 
                            className="flex items-center gap-1 cursor-pointer"
                            onClick={(e) => {
-                              e.stopPropagation();
+                             e.stopPropagation();
                            }}
                          >
-                            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topic.creator}`} alt="" className="w-4 h-4 rounded-full bg-soft object-cover" />
-                            <span className="text-[10px] text-white/40">@{topic.creator}</span>
+                            <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topic.creator}`} alt="" className="w-4 h-4 rounded-full bg-[#f1e8dc] object-cover" />
+                            <span className="text-[10px] text-[#8f7f6d]">@{topic.creator}</span>
                          </div>
                         {topic.status === 'completed' ? (
-                          <div className="flex items-center gap-1 text-[10px] text-white/60">
+                          <div className="flex items-center gap-1 text-[10px] text-[#8f7f6d]">
                             <Heart size={10} className="fill-gold stroke-none" /> {topic.likes}
                           </div>
                         ) : (
-                          <div className="flex items-center gap-1 text-[10px] text-gold font-black italic">
+                          <div className="flex items-center gap-1 text-[10px] text-[#b4834a] font-black italic">
                             <Users size={10} className="fill-gold stroke-none" /> {topic.joinedCount}/{topic.targetCount}
                           </div>
                         )}
@@ -2587,7 +2594,7 @@ const MyWorksScreen = ({ setScreen, topics, setSelectedTopic, userVlogs, setCirc
             })}
             {filteredWorks.length === 0 && (
               <div className="col-span-2 py-20 text-center">
-                <p className="text-white/20 text-xs font-black uppercase tracking-widest">暂无相关作品</p>
+                <p className="text-[#b0a08e] text-xs font-black uppercase tracking-widest">暂无相关作品</p>
               </div>
             )}
           </div>
@@ -2638,25 +2645,25 @@ const CreateCircleScreen = ({ setScreen, setSelectedTopic, initialTopicInfo }: {
     .join('、');
 
   return (
-    <div className="flex flex-col h-full bg-dark pt-8 relative overflow-hidden">
-      <header className="p-6 flex items-center justify-between z-20 sticky top-0 bg-dark/80 backdrop-blur-xl border-b border-white/[0.03]">
-        <button onClick={() => setScreen('home')} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center border border-white/5">
-          <ArrowLeft size={20} className="text-white" />
+    <div className={`${lightPageRootPadded} relative overflow-hidden`}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen('home')} className={lightIconButton}>
+          <ArrowLeft size={20} />
         </button>
-        <h2 className="font-bold text-white">发起共创</h2>
+        <h2 className="font-bold text-[#2f261d]">发起共创</h2>
         <div className="w-10 h-10"></div>
       </header>
 
       <main className="flex-1 p-6 space-y-8 overflow-y-auto no-scrollbar pb-10">
         <div className="space-y-4">
           <input 
-            className="w-full h-14 bg-soft rounded-2xl px-5 font-bold outline-none border border-white/5 focus:border-white/20 text-white" 
+            className={`w-full h-14 rounded-2xl px-5 font-bold outline-none focus:border-[#FE2C55]/25 ${lightInputField}`} 
             placeholder="你需要大家做什么" 
             value={topicTitle}
             onChange={(e) => setTopicTitle(e.target.value)}
           />
           <textarea
-            className="w-full bg-soft rounded-2xl p-5 font-medium outline-none border border-white/5 focus:border-white/20 text-white text-sm min-h-[120px] resize-none"
+            className={`w-full rounded-2xl p-5 font-medium outline-none focus:border-[#FE2C55]/25 text-sm min-h-[120px] resize-none ${lightInputField}`}
             placeholder="添加话题描述，让更多人加入共创..."
             value={topicDescription}
             onChange={(e) => setTopicDescription(e.target.value)}
@@ -2664,13 +2671,13 @@ const CreateCircleScreen = ({ setScreen, setSelectedTopic, initialTopicInfo }: {
         </div>
 
         <div className="space-y-4">
-          <label className="text-[10px] font-black uppercase text-white/40 tracking-widest ml-1">参与人数（2-12）</label>
+          <label className="text-[10px] font-black uppercase text-[#b19f8d] tracking-widest ml-1">参与人数（2-12）</label>
           <div className="grid grid-cols-4 gap-2">
             {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => (
               <button 
                 key={num} 
                 onClick={() => setParticipants(num)}
-                className={`h-12 rounded-2xl font-black text-xs transition-all ${participants === num ? 'bg-gold text-dark shadow-lg shadow-gold/20' : 'bg-white/5 text-white/40 border border-white/5'}`}
+                className={`h-12 rounded-2xl font-black text-xs transition-all ${participants === num ? 'bg-[#FE2C55] text-white shadow-[0_12px_24px_rgba(254,44,85,0.18)]' : 'bg-white/82 text-[#8f7f6d] border border-[#eadfce]'}`}
               >
                 {num} 人
               </button>
@@ -2679,23 +2686,23 @@ const CreateCircleScreen = ({ setScreen, setSelectedTopic, initialTopicInfo }: {
         </div>
 
         <div className="space-y-4">
-          <label className="text-[10px] font-black uppercase text-white/40 tracking-widest ml-1">作品时间限制 (3-10秒)</label>
-          <div className="flex items-center gap-4 bg-soft p-4 rounded-2xl border border-white/5">
-             <span className="text-sm font-bold text-white w-8">{duration}s</span>
+          <label className="text-[10px] font-black uppercase text-[#b19f8d] tracking-widest ml-1">作品时间限制 (3-10秒)</label>
+          <div className="flex items-center gap-4 p-4 rounded-2xl border border-[#eadfce] bg-white/82 shadow-sm">
+             <span className="text-sm font-bold text-[#2f261d] w-8">{duration}s</span>
              <input 
                type="range" 
                min="3" 
                max="10" 
                value={duration} 
                onChange={(e) => setDuration(parseInt(e.target.value))}
-               className="flex-1 accent-gold h-1 bg-white/10 rounded-full appearance-none cursor-pointer"
+               className="flex-1 h-1 rounded-full appearance-none cursor-pointer accent-[#FE2C55] bg-[#eadfce]"
              />
              <div className="flex gap-1">
                 {[3, 5, 8, 10].map(v => (
                   <button 
                     key={v}
                     onClick={() => setDuration(v)}
-                    className={`px-2 py-1 rounded-lg text-[8px] font-black tracking-tighter ${duration === v ? 'bg-gold text-dark' : 'bg-white/5 text-white/40'}`}
+                    className={`px-2 py-1 rounded-lg text-[8px] font-black tracking-tighter ${duration === v ? 'bg-[#FE2C55] text-white' : 'bg-[#f6ede3] text-[#8f7f6d]'}`}
                   >
                     {v}S
                   </button>
@@ -2705,41 +2712,41 @@ const CreateCircleScreen = ({ setScreen, setSelectedTopic, initialTopicInfo }: {
         </div>
 
         <div className="space-y-4">
-          <label className="text-[10px] font-black uppercase text-white/40 tracking-widest ml-1">可见范围</label>
+          <label className="text-[10px] font-black uppercase text-[#b19f8d] tracking-widest ml-1">可见范围</label>
           <div 
             onClick={() => setShowSelector(true)}
-            className="p-6 rounded-[32px] border border-white/5 bg-white/5 flex items-center justify-between active:bg-white/10 transition-all group"
+            className={`p-6 flex items-center justify-between active:bg-[#fbf6ef] transition-all group ${lightSurfaceCard}`}
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 group-active:text-gold transition-colors">
+              <div className="w-12 h-12 rounded-2xl bg-[#f6ede3] flex items-center justify-center text-[#8f7f6d] group-active:text-[#FE2C55] transition-colors">
                 {visibility === 'public' && <Globe size={20} />}
                 {visibility === 'friends' && <Users2 size={20} />}
                 {visibility === 'private' && <Lock size={20} />}
                 {visibility === 'selected' && <UserIcon size={20} />}
               </div>
               <div>
-                <p className="text-sm font-black text-white tracking-wide">谁可以看</p>
+                <p className="text-sm font-black text-[#2f261d] tracking-wide">谁可以看</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <p className="text-[10px] text-gold font-bold uppercase tracking-widest">
+                  <p className="text-[10px] text-[#b4834a] font-bold uppercase tracking-widest">
                     {visibility === 'public' && '公开'}
                     {visibility === 'friends' && '朋友'}
                     {visibility === 'private' && '私密'}
                     {visibility === 'selected' && '部分可见'}
                   </p>
                   {visibility === 'selected' && selectedFriendIds.size > 0 && (
-                    <span className="text-[9px] text-white/20 font-medium">({selectedFriendNames.length > 15 ? selectedFriendNames.slice(0, 15) + '...' : selectedFriendNames})</span>
+                    <span className="text-[9px] text-[#aa9a86] font-medium">({selectedFriendNames.length > 15 ? selectedFriendNames.slice(0, 15) + '...' : selectedFriendNames})</span>
                   )}
                 </div>
               </div>
             </div>
-            <ChevronRight size={18} className="text-white/20" />
+            <ChevronRight size={18} className="text-[#c0b09d]" />
           </div>
         </div>
 
       </main>
 
-      <footer className="p-6 pb-10 bg-dark/80 backdrop-blur-md border-t border-white/[0.03]">
-        <p className="text-[10px] text-white/40 text-center font-medium mb-4">
+      <footer className="p-6 pb-10 bg-[#f9f5ef]/90 backdrop-blur-md border-t border-[#e8dfd2]">
+        <p className="text-[10px] text-[#8f7f6d] text-center font-medium mb-4">
             创建话题后，该话题产生的收益，将由所有同圈的创作者平分。
         </p>
         <button 
@@ -2763,7 +2770,7 @@ const CreateCircleScreen = ({ setScreen, setSelectedTopic, initialTopicInfo }: {
             setSelectedTopic(newTopic);
             setScreen('topic-detail');
           }} 
-          className="w-full h-14 bg-white text-dark rounded-full font-black uppercase text-xs shadow-2xl active:scale-95 transition-transform flex items-center justify-center"
+          className="w-full h-14 bg-[#FE2C55] text-white rounded-full font-black uppercase text-xs shadow-[0_18px_40px_rgba(254,44,85,0.22)] active:scale-95 transition-transform flex items-center justify-center"
         >
           发起召集
         </button>
@@ -3427,7 +3434,7 @@ const CircleScreen = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={(e) => { e.stopPropagation(); setIsGiftDrawerOpen(false); }}
-            className="absolute inset-0 z-[100] bg-black/60 backdrop-blur-sm flex flex-col justify-end"
+            className="absolute inset-0 z-[100] bg-[rgba(72,56,39,0.18)] backdrop-blur-sm flex flex-col justify-end"
           >
             <motion.div
               initial={{ y: '100%' }}
@@ -3435,15 +3442,15 @@ const CircleScreen = ({
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-[#111111] rounded-t-3xl pt-6 pb-10 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border-t border-white/5 flex flex-col max-h-[72vh]"
+              className="bg-[#fffaf5] rounded-t-3xl pt-6 pb-10 shadow-[0_-10px_40px_rgba(103,81,58,0.14)] border-t border-[#eadfce] flex flex-col max-h-[72vh]"
             >
-              <div className="w-12 h-1.5 bg-white/10 rounded-full mx-auto mb-6 flex-shrink-0" />
+              <div className="w-12 h-1.5 bg-[#eadfce] rounded-full mx-auto mb-6 flex-shrink-0" />
               <div className="flex justify-between items-center px-6 pb-5">
                 <div>
-                  <h3 className="text-white font-bold text-lg">选择礼物</h3>
-                  <p className="text-[10px] text-white/30 font-black uppercase tracking-widest mt-1">赠送后将展示在评论区</p>
+                  <h3 className="text-[#2f261d] font-bold text-lg">选择礼物</h3>
+                  <p className="text-[10px] text-[#9f8f7e] font-black uppercase tracking-widest mt-1">赠送后将展示在评论区</p>
                 </div>
-                <button onClick={() => setIsGiftDrawerOpen(false)} className="w-8 h-8 flex items-center justify-center bg-white/10 rounded-full text-white/60 active:scale-95 transition-transform">
+                <button onClick={() => setIsGiftDrawerOpen(false)} className="w-8 h-8 flex items-center justify-center bg-white rounded-full text-[#8f7f6d] border border-[#eadfce] active:scale-95 transition-transform shadow-sm">
                   <X size={16} />
                 </button>
               </div>
@@ -3456,11 +3463,11 @@ const CircleScreen = ({
                       showToast(`已送出${gift.name}`);
                       setIsGiftDrawerOpen(false);
                     }}
-                    className="bg-white/[0.04] border border-white/5 rounded-2xl p-3 flex flex-col items-center gap-2 active:scale-95 transition-transform"
+                    className="bg-white border border-[#eadfce] rounded-2xl p-3 flex flex-col items-center gap-2 active:scale-95 transition-transform shadow-sm"
                   >
                     <span className="text-3xl leading-none">{gift.icon}</span>
-                    <span className="text-[10px] font-black text-white/80 leading-tight text-center">{gift.name}</span>
-                    <span className="text-[9px] font-black text-gold tracking-widest">{gift.price}</span>
+                    <span className="text-[10px] font-black text-[#2f261d] leading-tight text-center">{gift.name}</span>
+                    <span className="text-[9px] font-black text-[#FE2C55] tracking-widest">{gift.price}</span>
                   </button>
                 ))}
               </div>
@@ -3754,13 +3761,13 @@ const EnergyDetailScreen = ({ setScreen, prevScreen, balance }: { setScreen: (s:
   });
 
   return (
-    <div className="flex flex-col h-full bg-dark">
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-dark/80 backdrop-blur-xl z-20 border-b border-white/[0.03]">
-        <button onClick={() => setScreen(prevScreen)} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center border border-white/5">
-          <ArrowLeft size={20} className="text-white" />
+    <div className={lightPageRoot}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen(prevScreen)} className={lightIconButton}>
+          <ArrowLeft size={20} />
         </button>
-        <h2 className="font-bold text-white text-lg tracking-tight">积分明细</h2>
-        <button onClick={() => setShowInfo(!showInfo)} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center text-white/40">
+        <h2 className="font-bold text-[#2f261d] text-lg tracking-tight">积分明细</h2>
+        <button onClick={() => setShowInfo(!showInfo)} className={lightIconButton}>
           <HelpCircle size={20} />
         </button>
       </header>
@@ -4608,21 +4615,21 @@ const SplashScreen = () => {
 
 const SmartRingScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
   return (
-    <div className="flex flex-col h-full bg-dark pt-8">
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-dark/80 backdrop-blur-xl z-20 border-b border-white/[0.03]">
-        <button onClick={() => setScreen('me')} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center border border-white/5 shadow-sm">
-          <ArrowLeft size={20} className="text-white" />
+    <div className={lightPageRootPadded}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen('me')} className={lightIconButton}>
+          <ArrowLeft size={20} />
         </button>
-        <h2 className="font-bold text-white text-lg tracking-tight">智能戒指</h2>
+        <h2 className="font-bold text-[#2f261d] text-lg tracking-tight">智能戒指</h2>
         <div className="w-10 h-10"></div>
       </header>
 
       <main className="flex-1 p-6 space-y-6 overflow-y-auto no-scrollbar pb-12">
-        <section className="bg-gradient-to-br from-gold/30 via-card to-card p-8 bento-card border border-gold/10 flex items-center justify-between shadow-xl">
+        <section className="bg-gradient-to-br from-[#fff7eb] via-white to-[#f6ede3] p-8 rounded-[32px] border border-[#f0dfc0] flex items-center justify-between shadow-xl">
            <div className="space-y-2 relative z-10">
-              <p className="text-xs font-black uppercase text-gold tracking-widest">DR Ring Pro</p>
-              <h3 className="text-6xl font-bold leading-none text-white">86</h3>
-              <p className="text-white/40 text-xs italic">今日状态良好 · 已佩戴 7.5h</p>
+              <p className="text-xs font-black uppercase text-[#b4834a] tracking-widest">DR Ring Pro</p>
+              <h3 className="text-6xl font-bold leading-none text-[#2f261d]">86</h3>
+              <p className="text-[#8f7f6d] text-xs italic">今日状态良好 · 已佩戴 7.5h</p>
            </div>
            <img src="https://images.unsplash.com/photo-1611078440058-20412803b9b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80" alt="Ring" className="w-24 h-24 rounded-full border-[10px] border-gold shadow-[0_0_40px_rgba(214,178,126,0.1)] relative z-10 object-cover" />
         </section>
@@ -4633,43 +4640,43 @@ const SmartRingScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
              { label: '睡眠', val: '82', desc: '1h 深睡', tone: 'indigo' },
              { label: '活动', val: '74', desc: '1.8k 步', tone: 'emerald' },
            ].map(item => (
-             <div key={item.label} className="p-4 bg-card bento-card border border-white/5 space-y-2 shadow-lg">
-                <p className="text-[10px] font-black uppercase text-white/30 tracking-widest">{item.label}</p>
-                <p className="text-xl font-bold text-white">{item.val}</p>
-                <p className="text-[10px] text-white/20 truncate italic">{item.desc}</p>
+             <div key={item.label} className={`p-4 space-y-2 shadow-lg ${lightSurfaceCard}`}>
+                <p className="text-[10px] font-black uppercase text-[#b0a08e] tracking-widest">{item.label}</p>
+                <p className="text-xl font-bold text-[#2f261d]">{item.val}</p>
+                <p className="text-[10px] text-[#8f7f6d] truncate italic">{item.desc}</p>
              </div>
            ))}
         </section>
 
-        <section className="p-6 bg-card bento-card border border-white/5 space-y-6 shadow-xl">
+        <section className={`p-6 space-y-6 shadow-xl ${lightSurfaceCard}`}>
            <div className="flex justify-between items-center">
-              <h4 className="font-bold text-sm text-white">心率趋势 (24h)</h4>
-              <span className="text-[10px] font-black text-white/10 uppercase tracking-widest underline decoration-green-500/30">同步正常</span>
+              <h4 className="font-bold text-sm text-[#2f261d]">心率趋势 (24h)</h4>
+              <span className="text-[10px] font-black text-[#b0a08e] uppercase tracking-widest underline decoration-green-500/30">同步正常</span>
            </div>
            <div className="h-24 flex items-end gap-2 px-1">
               {[40, 60, 45, 80, 55, 70, 50, 65, 40].map((h, i) => (
                 <div key={i} className="flex-1 bg-gradient-to-t from-gold/5 via-gold/10 to-gold/40 rounded-t-full" style={{ height: `${h}%` }}></div>
               ))}
            </div>
-           <div className="pt-4 border-t border-white/5 flex justify-between">
+           <div className="pt-4 border-t border-[#eadfce] flex justify-between">
               <div>
-                 <p className="text-[10px] font-black uppercase text-white/20">静息心率</p>
-                 <p className="text-lg font-bold text-white">62 bpm</p>
+                 <p className="text-[10px] font-black uppercase text-[#b0a08e]">静息心率</p>
+                 <p className="text-lg font-bold text-[#2f261d]">62 bpm</p>
               </div>
               <div className="text-right">
-                 <p className="text-[10px] font-black uppercase text-white/20">HRV 变异率</p>
-                 <p className="text-lg font-bold text-white">48 ms</p>
+                 <p className="text-[10px] font-black uppercase text-[#b0a08e]">HRV 变异率</p>
+                 <p className="text-lg font-bold text-[#2f261d]">48 ms</p>
               </div>
            </div>
         </section>
 
-        <div className="p-4 bg-soft rounded-[24px] border border-white/5 flex gap-4 items-center">
-           <div className="w-10 h-10 bg-gold/10 rounded-xl flex items-center justify-center text-gold">
+        <div className="p-4 bg-white/82 rounded-[24px] border border-[#eadfce] flex gap-4 items-center shadow-sm">
+           <div className="w-10 h-10 bg-[#fff1dc] rounded-xl flex items-center justify-center text-[#b4834a]">
               <Bell size={20} />
            </div>
            <div className="flex-1">
-              <p className="text-sm font-bold text-white">今晚建议早点休息</p>
-              <p className="text-xs text-white/40 mt-0.5 leading-relaxed italic">体温较昨日略高，身体处于恢复期。</p>
+              <p className="text-sm font-bold text-[#2f261d]">今晚建议早点休息</p>
+              <p className="text-xs text-[#8f7f6d] mt-0.5 leading-relaxed italic">体温较昨日略高，身体处于恢复期。</p>
            </div>
         </div>
       </main>
@@ -4700,54 +4707,54 @@ const DMScreen = ({ setScreen, setSelectedUserName }: { setScreen: (s: Screen) =
   };
 
   return (
-    <div className="flex flex-col h-full bg-dark pt-8 relative overflow-hidden">
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-dark/80 backdrop-blur-xl z-20 border-b border-white/[0.03]">
-        <button onClick={() => setScreen('messages')} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center border border-white/5">
-          <ArrowLeft size={20} className="text-white" />
+    <div className={`${lightPageRootPadded} relative overflow-hidden`}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen('messages')} className={lightIconButton}>
+          <ArrowLeft size={20} />
         </button>
         <div className="text-center group active:scale-95 transition-transform cursor-pointer" onClick={() => {
             setSelectedUserName(userName);
             setScreen('user-profile');
         }}>
-           <h2 className="font-bold text-white">{userName}</h2>
-           <p className="text-[10px] text-green-400 font-black uppercase tracking-widest">在线 · 共创进行中</p>
+           <h2 className="font-bold text-[#2f261d]">{userName}</h2>
+           <p className="text-[10px] text-emerald-500 font-black uppercase tracking-widest">在线 · 共创进行中</p>
         </div>
-        <button onClick={() => setScreen('gift')} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center text-rose-500 border border-white/5">
+        <button onClick={() => setScreen('gift')} className={lightIconButton}>
           <Gift size={20} />
         </button>
       </header>
 
-      <main className="flex-1 p-6 space-y-6 overflow-y-auto no-scrollbar pb-32">
+      <main className="flex-1 p-6 space-y-6 overflow-y-auto no-scrollbar pb-32 bg-[linear-gradient(180deg,#fbf7f1_0%,#f4ede4_100%)]">
          <div className="flex justify-center">
-            <span className="bg-white/5 px-3 py-1 rounded-full text-[10px] font-black text-white/20 uppercase tracking-widest">09:41</span>
+            <span className="bg-white/82 border border-[#eadfce] px-3 py-1 rounded-full text-[10px] font-black text-[#9a8a78] uppercase tracking-widest">09:41</span>
          </div>
 
          {messages.map((m) => (
            <div key={m.id} className={`flex gap-4 ${m.sender === 'me' ? 'flex-row-reverse' : 'flex-row'} max-w-full animate-in fade-in slide-in-from-bottom-2`}>
-              <div className="w-10 h-10 rounded-2xl bg-soft flex-shrink-0 border border-white/5"></div>
+              <div className="w-10 h-10 rounded-2xl bg-[#f1e8dc] flex-shrink-0 border border-[#eadfce]"></div>
               <div className={`p-4 shadow-lg space-y-2 border ${
                 m.sender === 'me' 
-                ? 'bg-white rounded-[24px] rounded-tr-none text-dark border-transparent' 
-                : 'bg-card rounded-[24px] rounded-tl-none text-white/80 border-white/5'
+                ? 'bg-[#fff2f5] rounded-[24px] rounded-tr-none text-[#2f261d] border-[#ffd3dd]' 
+                : 'bg-white rounded-[24px] rounded-tl-none text-[#5f5348] border-[#eadfce]'
               }`}>
                  <p className="text-xs leading-relaxed font-medium">{m.text}</p>
-                 <span className={`text-[8px] font-black block text-right uppercase tracking-widest ${m.sender === 'me' ? 'text-dark/40' : 'text-white/20'}`}>
+                 <span className={`text-[8px] font-black block text-right uppercase tracking-widest ${m.sender === 'me' ? 'text-[#a78d92]' : 'text-[#b0a08e]'}`}>
                    {m.time}
                  </span>
               </div>
            </div>
          ))}
 
-         <div className="mx-auto w-full p-4 bg-card bento-card border border-gold/30 space-y-4 shadow-xl">
+         <div className={`mx-auto w-full p-4 space-y-4 ${lightSurfaceCard}`}>
             <div className="flex justify-between items-start">
-               <p className="text-[10px] font-black text-gold tracking-widest uppercase">共创动态</p>
-               <span className="text-[10px] font-black text-white/20">召集中</span>
+               <p className="text-[10px] font-black text-[#b4834a] tracking-widest uppercase">共创动态</p>
+               <span className="text-[10px] font-black text-[#b0a08e]">召集中</span>
             </div>
             <div>
-               <h4 className="font-bold text-white">今天的城市声音</h4>
-               <p className="text-[10px] text-white/40 mt-1 italic">6/8 · 过程与成品同步预览</p>
+               <h4 className="font-bold text-[#2f261d]">今天的城市声音</h4>
+               <p className="text-[10px] text-[#8f7f6d] mt-1 italic">6/8 · 过程与成品同步预览</p>
             </div>
-            <button onClick={() => setScreen('topic-detail')} className="w-full h-10 bg-gold/10 text-gold font-black text-[10px] uppercase rounded-xl border border-gold/20">
+            <button onClick={() => setScreen('topic-detail')} className="w-full h-10 bg-[#fff1dc] text-[#b4834a] font-black text-[10px] uppercase rounded-xl border border-[#f0dfc0]">
                进入话题详情
             </button>
          </div>
@@ -4756,22 +4763,22 @@ const DMScreen = ({ setScreen, setSelectedUserName }: { setScreen: (s: Screen) =
       </main>
 
       <div className="absolute inset-x-6 bottom-8 z-50">
-         <div className="h-14 glass-pill rounded-full flex items-center pr-2 pl-6 gap-4 shadow-2xl bg-dark/80 backdrop-blur-xl border border-white/5">
+         <div className="h-14 rounded-full flex items-center pr-2 pl-6 gap-4 shadow-2xl bg-white/92 backdrop-blur-xl border border-[#eadfce]">
             <input 
-              className="flex-1 bg-transparent text-sm font-bold placeholder:text-white/20 outline-none text-white" 
+              className="flex-1 bg-transparent text-sm font-bold placeholder:text-[#baa897] outline-none text-[#2f261d]" 
               placeholder="想对林野说点什么..." 
               value={msg}
               onChange={(e) => setMsg(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
             />
-            <button onClick={() => setScreen('gift')} className="w-10 h-10 bg-gold/10 rounded-full flex items-center justify-center text-gold">
+            <button onClick={() => setScreen('gift')} className="w-10 h-10 bg-[#fff1dc] rounded-full flex items-center justify-center text-[#b4834a]">
                <Gift size={20} />
             </button>
             <button 
               onClick={handleSend}
               disabled={!msg.trim()}
               className={`h-10 px-6 font-black rounded-full text-xs uppercase shadow-xl transition-all ${
-                msg.trim() ? 'bg-white text-dark' : 'bg-white/5 text-white/10'
+                msg.trim() ? 'bg-[#FE2C55] text-white' : 'bg-[#f3e8ea] text-[#d9b7bf]'
               }`}
             >
                发送
@@ -4786,36 +4793,36 @@ const DMScreen = ({ setScreen, setSelectedUserName }: { setScreen: (s: Screen) =
 
 const ShopScreen = ({ setScreen, balance }: { setScreen: (s: Screen) => void, balance: number }) => {
   return (
-    <div className="flex flex-col h-full bg-dark pt-8">
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-dark/80 backdrop-blur-xl z-20 border-b border-white/[0.03]">
-        <button onClick={() => setScreen('me')} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center border border-white/5">
-          <ArrowLeft size={20} className="text-white" />
+    <div className={lightPageRootPadded}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen('me')} className={lightIconButton}>
+          <ArrowLeft size={20} />
         </button>
-        <h2 className="font-bold text-white text-lg tracking-tight">DR商城</h2>
+        <h2 className="font-bold text-[#2f261d] text-lg tracking-tight">DR商城</h2>
         <div className="w-10 h-10"></div>
       </header>
 
       <main className="flex-1 p-6 space-y-6 overflow-y-auto no-scrollbar pb-24">
-        <section className="p-8 bg-gradient-to-br from-card via-card to-indigo-500/10 bento-card border border-indigo-500/10 space-y-3 relative overflow-hidden shadow-xl">
-           <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl -mr-16 -mt-16"></div>
-           <p className="text-xs font-black uppercase text-indigo-400 tracking-widest relative z-10">我的积分余额</p>
-           <h1 className="text-6xl font-bold relative z-10 text-white">{balance.toLocaleString()}</h1>
-           <p className="text-white/40 text-xs relative z-10 leading-relaxed italic">
+        <section className="p-8 bg-gradient-to-br from-white via-[#fffaf3] to-[#f6ede3] rounded-[32px] border border-[#eadfce] space-y-3 relative overflow-hidden shadow-xl">
+           <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-100 blur-3xl -mr-16 -mt-16"></div>
+           <p className="text-xs font-black uppercase text-indigo-500 tracking-widest relative z-10">我的积分余额</p>
+           <h1 className="text-6xl font-bold relative z-10 text-[#2f261d]">{balance.toLocaleString()}</h1>
+           <p className="text-[#8f7f6d] text-xs relative z-10 leading-relaxed italic">
              积分由共创礼物及动态获得，仅限商城内实物或虚拟权益兑换。
            </p>
         </section>
 
         <div className="grid grid-cols-2 gap-4">
            {SHOP_ITEMS.map(item => (
-              <div key={item.name} className="p-4 bg-card bento-card border border-white/5 space-y-4 shadow-lg group active:scale-95 transition-transform">
-                 <div className="aspect-square rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-indigo-500/5 transition-colors overflow-hidden">
+              <div key={item.name} className={`p-4 space-y-4 shadow-lg group active:scale-95 transition-transform ${lightSurfaceCard}`}>
+                 <div className="aspect-square rounded-2xl bg-[#f6ede3] flex items-center justify-center group-hover:bg-indigo-50 transition-colors overflow-hidden">
                     <img src={`https://images.unsplash.com/photo-${item.price === '680' ? '1542291026-7eec264c27ff' : item.price === '320' ? '1610421255869-7c1bd36122d7' : item.price === '880' ? '1505740420928-5e560c06d30e' : '1523275335684-37898b6baf30'}?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80`} alt={item.name} className="w-full h-full object-cover mix-blend-overlay opacity-80 group-hover:opacity-100 transition-opacity" />
                  </div>
                  <div>
-                    <h4 className="font-bold text-sm text-white">{item.name}</h4>
-                    <p className="text-gold text-lg font-bold mt-1">{item.price}<span className="text-[10px] text-white/20 ml-1 uppercase font-black">{item.unit}</span></p>
+                    <h4 className="font-bold text-sm text-[#2f261d]">{item.name}</h4>
+                    <p className="text-[#b4834a] text-lg font-bold mt-1">{item.price}<span className="text-[10px] text-[#b0a08e] ml-1 uppercase font-black">{item.unit}</span></p>
                  </div>
-                 <button className="w-full h-10 bg-white/5 border border-white/5 rounded-xl text-[10px] font-black uppercase text-white/40 hover:text-white transition-all">
+                 <button className="w-full h-10 bg-white border border-[#eadfce] rounded-xl text-[10px] font-black uppercase text-[#8f7f6d] hover:text-[#2f261d] transition-all">
                     立即兑换
                  </button>
               </div>
@@ -4830,21 +4837,21 @@ const ShopScreen = ({ setScreen, balance }: { setScreen: (s: Screen) => void, ba
 
 const RechargeScreen = ({ setScreen, balance }: { setScreen: (s: Screen) => void, balance: number }) => {
   return (
-    <div className="flex flex-col h-full bg-dark pt-8">
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-dark/80 backdrop-blur-xl z-20 border-b border-white/[0.03]">
-        <button onClick={() => setScreen('me')} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center border border-white/5 shadow-sm">
-          <ArrowLeft size={20} className="text-white" />
+    <div className={lightPageRootPadded}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen('me')} className={lightIconButton}>
+          <ArrowLeft size={20} />
         </button>
-        <h2 className="font-bold text-white text-lg tracking-tight">钻石充值</h2>
+        <h2 className="font-bold text-[#2f261d] text-lg tracking-tight">钻石充值</h2>
         <div className="w-10 h-10"></div>
       </header>
 
       <main className="flex-1 p-6 space-y-8 overflow-y-auto no-scrollbar pb-24">
         <div className="space-y-3">
-           <p className="text-xs font-black text-white/40 tracking-widest uppercase">账户可用余额</p>
-           <h1 className="text-6xl font-bold flex items-center gap-4 text-white">
+           <p className="text-xs font-black text-[#8f7f6d] tracking-widest uppercase">账户可用余额</p>
+           <h1 className="text-6xl font-bold flex items-center gap-4 text-[#2f261d]">
               {balance.toLocaleString()}
-              <div className="w-10 h-10 bg-gold rounded-xl flex items-center justify-center rotate-45 shadow-lg shadow-gold/20"></div>
+              <div className="w-10 h-10 bg-[#fff1dc] border border-[#f0dfc0] rounded-xl flex items-center justify-center rotate-45 shadow-lg"></div>
            </h1>
         </div>
 
@@ -4855,17 +4862,17 @@ const RechargeScreen = ({ setScreen, balance }: { setScreen: (s: Screen) => void
             { amount: '328', label: '32+5 钻石', price: '32.00', bonus: true },
             { amount: '648', label: '64+12 钻石', price: '64.00', bonus: true },
           ].map(opt => (
-            <div key={opt.amount} className={`p-6 bento-card border active:scale-95 transition-all cursor-pointer shadow-lg ${opt.bonus ? 'bg-gold/5 border-gold/10' : 'bg-card border-white/5'}`}>
-               <p className={`text-sm font-bold ${opt.bonus ? 'text-gold' : 'text-white/60'}`}>{opt.label}</p>
-               <h3 className="text-3xl font-bold mt-2 text-white">{opt.price}</h3>
+            <div key={opt.amount} className={`p-6 rounded-[32px] border active:scale-95 transition-all cursor-pointer shadow-lg ${opt.bonus ? 'bg-[#fff7eb] border-[#f0dfc0]' : 'bg-white/82 border-[#eadfce]'}`}>
+               <p className={`text-sm font-bold ${opt.bonus ? 'text-[#b4834a]' : 'text-[#8f7f6d]'}`}>{opt.label}</p>
+               <h3 className="text-3xl font-bold mt-2 text-[#2f261d]">{opt.price}</h3>
                {opt.bonus && <span className="inline-block mt-4 px-2 py-0.5 bg-gold text-dark text-[8px] font-black rounded uppercase">赠送礼包</span>}
             </div>
           ))}
         </div>
 
-        <div className="p-6 bg-soft rounded-[32px] border border-white/5 space-y-4">
-           <h4 className="font-bold text-sm text-white">充值说明</h4>
-           <p className="text-xs text-white/40 leading-relaxed italic">
+        <div className="p-6 bg-white/82 rounded-[32px] border border-[#eadfce] space-y-4 shadow-sm">
+           <h4 className="font-bold text-sm text-[#2f261d]">充值说明</h4>
+           <p className="text-xs text-[#8f7f6d] leading-relaxed italic">
              钻石是 DR圈内的通用货币，可用于礼物赠送、道具购买等。一旦充值暂不支持退款，请理性参与共创。
            </p>
         </div>
@@ -5370,54 +5377,54 @@ const UserProfileScreen = ({ setScreen, userName, prevScreen, showToast, setInit
 
 const PersonalProfileScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
   return (
-    <div className="flex flex-col h-full bg-dark pt-8">
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-dark/80 backdrop-blur-xl z-20">
-        <button onClick={() => setScreen('me')} className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center">
+    <div className={lightPageRootPadded}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen('me')} className={lightIconButton}>
           <ArrowLeft size={20} />
         </button>
-        <h2 className="font-bold">个人主页</h2>
+        <h2 className="font-bold text-[#2f261d]">个人主页</h2>
         <div className="w-10"></div>
       </header>
 
       <main className="flex-1 overflow-y-auto no-scrollbar pb-32">
         <section className="text-center py-10">
-           <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Wesley" alt="" className="w-32 h-32 rounded-[40px] border border-white/10 mx-auto shadow-2xl object-cover" />
-           <h1 className="text-3xl font-bold mt-6">Wesley</h1>
-           <p className="text-white/40 text-sm mt-1 uppercase tracking-widest font-black">@wesleyyy1</p>
-           <p className="text-white/20 text-[10px] font-bold mt-1">IP：广东</p>
-           <p className="text-white/50 text-xs leading-relaxed mt-4 px-8">
+           <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Wesley" alt="" className="w-32 h-32 rounded-[40px] border border-[#eadfce] bg-white mx-auto shadow-2xl object-cover" />
+           <h1 className="text-3xl font-bold mt-6 text-[#2f261d]">Wesley</h1>
+           <p className="text-[#8f7f6d] text-sm mt-1 uppercase tracking-widest font-black">@wesleyyy1</p>
+           <p className="text-[#b0a08e] text-[10px] font-bold mt-1">IP：广东</p>
+           <p className="text-[#7d6f61] text-xs leading-relaxed mt-4 px-8">
              喜欢记录城市里转瞬即逝的真实片段，也愿意和陌生人一起完成一段共同记忆。
            </p>
         </section>
 
         <section className="px-6 space-y-4">
-           <div className="p-6 bg-gradient-to-br from-indigo-500/20 to-dark bento-card border border-indigo-500/10 flex items-center justify-between">
+           <div className="p-6 bg-gradient-to-br from-[#eef3fb] to-white rounded-[32px] border border-[#dfe7f6] flex items-center justify-between shadow-[0_18px_40px_rgba(103,81,58,0.06)]">
               <div>
-                 <p className="text-[10px] font-black uppercase text-indigo-400 tracking-widest">积分值</p>
-                 <h4 className="text-lg font-bold mt-1 text-white">DR 级 · 核心共创者</h4>
+                 <p className="text-[10px] font-black uppercase text-indigo-500 tracking-widest">积分值</p>
+                 <h4 className="text-lg font-bold mt-1 text-[#2f261d]">DR 级 · 核心共创者</h4>
               </div>
-              <div className="w-10 h-10 glass-pill rounded-xl flex items-center justify-center text-gold">
+              <div className="w-10 h-10 bg-white rounded-xl border border-[#eadfce] flex items-center justify-center text-[#b4834a]">
                  <ShieldCheck size={20} />
               </div>
            </div>
 
-           <div className="p-6 bg-card bento-card border border-white/5 space-y-4">
-              <h4 className="text-[10px] font-black uppercase text-white/40 tracking-widest">个人资料</h4>
+           <div className={`p-6 space-y-4 ${lightSurfaceCard}`}>
+              <h4 className="text-[10px] font-black uppercase text-[#b0a08e] tracking-widest">个人资料</h4>
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { label: '性别', value: '男' },
                   { label: '星座', value: '水瓶座' },
                   { label: '年龄', value: '27 岁' },
                 ].map(item => (
-                  <div key={item.label} className="rounded-2xl bg-white/5 border border-white/5 p-3">
-                    <p className="text-[9px] text-white/25 font-black uppercase tracking-widest">{item.label}</p>
-                    <p className="text-xs text-white font-bold mt-1">{item.value}</p>
+                  <div key={item.label} className="rounded-2xl bg-[#f6ede3] border border-[#eadfce] p-3">
+                    <p className="text-[9px] text-[#b0a08e] font-black uppercase tracking-widest">{item.label}</p>
+                    <p className="text-xs text-[#2f261d] font-bold mt-1">{item.value}</p>
                   </div>
                 ))}
               </div>
-              <div className="rounded-2xl bg-white/5 border border-white/5 p-4">
-                <p className="text-[9px] text-white/25 font-black uppercase tracking-widest">个人描述</p>
-                <p className="text-sm text-white/70 leading-relaxed mt-2">喜欢记录城市里转瞬即逝的真实片段，也愿意和陌生人一起完成一段共同记忆。</p>
+              <div className="rounded-2xl bg-[#f6ede3] border border-[#eadfce] p-4">
+                <p className="text-[9px] text-[#b0a08e] font-black uppercase tracking-widest">个人描述</p>
+                <p className="text-sm text-[#6f6256] leading-relaxed mt-2">喜欢记录城市里转瞬即逝的真实片段，也愿意和陌生人一起完成一段共同记忆。</p>
               </div>
            </div>
 
@@ -5426,20 +5433,20 @@ const PersonalProfileScreen = ({ setScreen }: { setScreen: (s: Screen) => void }
                 { label: '参与共创', val: '32', icon: Flame },
                 { label: '获得热度', val: '1.2k', icon: Heart },
               ].map(stat => (
-                <div key={stat.label} className="p-5 bg-card bento-card border border-white/5 space-y-3">
-                   <stat.icon size={16} className="text-white/20" />
+                <div key={stat.label} className={`p-5 space-y-3 ${lightSurfaceCard}`}>
+                   <stat.icon size={16} className="text-[#c0b09d]" />
                    <div>
-                      <p className="text-2xl font-bold leading-none">{stat.val}</p>
-                      <p className="text-[10px] font-black uppercase text-white/40 mt-1 tracking-widest">{stat.label}</p>
+                      <p className="text-2xl font-bold leading-none text-[#2f261d]">{stat.val}</p>
+                      <p className="text-[10px] font-black uppercase text-[#8f7f6d] mt-1 tracking-widest">{stat.label}</p>
                    </div>
                 </div>
               ))}
            </div>
 
-           <div className="p-6 bg-white/5 rounded-[32px] space-y-6 border border-white/5 shadow-2xl">
+           <div className="p-6 bg-white/82 rounded-[32px] space-y-6 border border-[#eadfce] shadow-2xl">
               <div className="flex justify-between items-center">
-                 <h4 className="text-[10px] font-black uppercase text-white/40 tracking-widest ml-1">已绑定关系</h4>
-                 <button onClick={() => setScreen('relation-invite')} className="w-8 h-8 glass-pill rounded-lg flex items-center justify-center text-white/40 hover:text-white transition-colors">
+                 <h4 className="text-[10px] font-black uppercase text-[#8f7f6d] tracking-widest ml-1">已绑定关系</h4>
+                 <button onClick={() => setScreen('relation-invite')} className="w-8 h-8 bg-white rounded-lg border border-[#eadfce] flex items-center justify-center text-[#8f7f6d] hover:text-[#2f261d] transition-colors">
                     <Plus size={18} />
                  </button>
               </div>
@@ -5448,19 +5455,19 @@ const PersonalProfileScreen = ({ setScreen }: { setScreen: (s: Screen) => void }
                    { name: '林野', type: '真爱', time: '214 天', color: 'rose' },
                    { name: 'Mia', type: '闺蜜', time: '45 天', color: 'indigo' },
                  ].map(rel => (
-                    <div key={rel.name} className="flex items-center justify-between p-4 glass-pill rounded-2xl border border-white/5 bg-white/[0.02]">
+                    <div key={rel.name} className="flex items-center justify-between p-4 rounded-2xl border border-[#eadfce] bg-white shadow-sm">
                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-soft flex items-center justify-center">
-                             <UserIcon size={16} className="text-white/20" />
+                          <div className="w-10 h-10 rounded-xl bg-[#f6ede3] flex items-center justify-center">
+                             <UserIcon size={16} className="text-[#c0b09d]" />
                           </div>
                           <div>
-                             <p className="text-sm font-bold">{rel.name}</p>
+                             <p className="text-sm font-bold text-[#2f261d]">{rel.name}</p>
                              <p className={`text-[10px] font-black uppercase tracking-widest ${rel.color === 'rose' ? 'text-rose-400' : 'text-indigo-400'}`}>{rel.type}</p>
                           </div>
                        </div>
                        <div className="text-right">
-                          <p className="text-[10px] font-black text-white/20 uppercase tracking-widest">绑定时长</p>
-                          <p className="text-xs font-bold">{rel.time}</p>
+                          <p className="text-[10px] font-black text-[#b0a08e] uppercase tracking-widest">绑定时长</p>
+                          <p className="text-xs font-bold text-[#2f261d]">{rel.time}</p>
                        </div>
                     </div>
                  ))}
