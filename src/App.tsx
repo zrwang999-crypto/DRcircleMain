@@ -219,6 +219,7 @@ const HomeScreen = ({
   showToast: (m: string) => void,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showGrowthPrompt, setShowGrowthPrompt] = useState(true);
   const homeTopics = topics.filter(t => t.status !== 'completed');
   const currentTopic = homeTopics[currentIndex % homeTopics.length];
   const isFavorite = savedTopicIds.has(currentTopic.id);
@@ -230,7 +231,7 @@ const HomeScreen = ({
   const prevTopic = () => setCurrentIndex((prev) => (prev - 1 + homeTopics.length) % homeTopics.length);
   
   return (
-    <div className="flex flex-col h-full bg-dark font-sans pt-8">
+    <div className="flex flex-col h-full bg-dark font-sans pt-8 relative overflow-hidden">
       <div className="pt-6">
         <SpotlightMarquee 
           spotlightTopics={marqueeTopics} 
@@ -375,6 +376,97 @@ const HomeScreen = ({
           </motion.div>
         </div>
       </main>
+
+      <AnimatePresence>
+        {showGrowthPrompt && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowGrowthPrompt(false)}
+            className="absolute inset-0 z-[120] bg-black/35 backdrop-blur-sm flex items-center justify-center p-5"
+          >
+            <motion.div
+              initial={{ y: 28, opacity: 0, scale: 0.98 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 28, opacity: 0, scale: 0.98 }}
+              transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-[360px] rounded-[32px] bg-[#fffaf4] px-5 pt-5 pb-6 text-[#2f261d] shadow-[0_24px_70px_rgba(78,56,35,0.24)]"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#b4834a]">今日成长</p>
+                  <h3 className="mt-1 text-2xl font-black tracking-tight">2/3 已完成</h3>
+                  <p className="mt-1 text-[12px] font-bold text-[#8f7f6d]">参与一个待成圈话题，就能点亮今日记录。</p>
+                </div>
+                <button
+                  onClick={() => setShowGrowthPrompt(false)}
+                  className="w-9 h-9 rounded-full bg-white text-[#7b6b5c] shadow-sm flex items-center justify-center active:scale-95 transition-transform shrink-0"
+                  aria-label="关闭"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              <button
+                onClick={() => {
+                  setSelectedTopic(currentTopic);
+                  setShowGrowthPrompt(false);
+                  setScreen('topic-detail');
+                }}
+                className="mt-5 w-full rounded-[24px] bg-white px-4 py-4 text-left shadow-sm active:scale-[0.99] transition-transform"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[11px] font-black text-[#8f7f6d]">最接近成圈</p>
+                    <p className="mt-1 text-sm font-black text-[#2f261d]">{currentTopic.title}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xl font-black text-[#b4834a]">{currentTopic.joinedCount}/{currentTopic.targetCount}</p>
+                    <p className="text-[9px] font-black text-[#aa9a86]">人数</p>
+                  </div>
+                </div>
+                <div className="mt-4 h-2 rounded-full bg-[#ebe2d4] overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-[#edbd79] to-[#ff2e67]"
+                    style={{ width: `${Math.min(100, (currentTopic.joinedCount / currentTopic.targetCount) * 100)}%` }}
+                  />
+                </div>
+              </button>
+
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                {[
+                  { title: '浏览 3 个共创', done: '3/3', reward: '+20', primary: true },
+                  { title: '回应一位好友', done: '0/1', reward: '+50' },
+                  { title: '参与待成圈话题', done: '0/2', reward: '+100' },
+                ].map((task) => (
+                  <div
+                    key={task.title}
+                    className={`rounded-[20px] border px-3 py-3 text-left shadow-sm ${
+                      task.primary ? 'border-[#ffbed0] bg-[#fff6f8]' : 'border-[#eadfce] bg-white'
+                    }`}
+                  >
+                    <p className="min-h-[32px] text-[11px] font-black leading-snug text-[#4a3a2a]">{task.title}</p>
+                    <div className="mt-3 flex items-center justify-between">
+                      <span className={`text-[10px] font-black ${task.primary ? 'text-[#FE2C55]' : 'text-[#b4834a]'}`}>{task.done}</span>
+                      <span className="rounded-full bg-[#fff1d8] px-2 py-0.5 text-[9px] font-black text-[#b4834a]">⚡ {task.reward}</span>
+                    </div>
+                    <button
+                      onClick={() => setShowGrowthPrompt(false)}
+                      className={`mt-3 h-8 w-full rounded-full text-[10px] font-black active:scale-95 transition-transform ${
+                        task.primary ? 'bg-[#FE2C55] text-white' : 'bg-[#2f261d] text-white'
+                      }`}
+                    >
+                      {task.primary ? '领取' : '去完成'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
