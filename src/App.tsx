@@ -3521,7 +3521,6 @@ const CircleScreen = ({
   const startLongPress = () => {
     setLongPressTimer(setTimeout(() => {
       setIsPureMode(prev => !prev);
-      showToast(isPureMode ? '退出纯净模式' : '进入纯净模式');
     }, 600));
   };
 
@@ -3551,9 +3550,6 @@ const CircleScreen = ({
       setShowClearScreenHint(false);
       if (!isPureMode) {
         setIsPureMode(true);
-        showToast('已进入清屏模式，右下角按钮可恢复');
-      } else {
-        showToast('已是清屏模式');
       }
     }
   };
@@ -3634,7 +3630,6 @@ const CircleScreen = ({
           onClick={(e) => {
             e.stopPropagation();
             setIsPureMode(false);
-            showToast('已退出纯净模式');
           }}
           className="absolute right-4 bottom-[116px] z-50 flex h-9 w-9 items-center justify-center rounded-full text-white shadow-lg drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] active:scale-95 transition-transform"
           aria-label="退出清屏模式"
@@ -3824,7 +3819,6 @@ const CircleScreen = ({
                           e.stopPropagation();
                           setShowClearScreenHint(false);
                           setIsPureMode(true);
-                          showToast('已进入清屏模式，右下角按钮可恢复');
                         }}
                         className="w-9 h-9 rounded-full flex items-center justify-center text-white active:scale-95 transition-transform drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
                       >
