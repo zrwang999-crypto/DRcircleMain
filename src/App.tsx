@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Camera, 
   MapPin, 
@@ -26,7 +26,8 @@ import {
   Star,
   Check,
   X,
-  Eye,
+  FileOutput,
+  FileX,
   Search,
   Bookmark,
   Trash2,
@@ -104,6 +105,49 @@ const userIpLocations: Record<string, string> = {
   小北: '江苏',
 };
 const getUserIpLocation = (name: string) => userIpLocations[name] || ['广东', '浙江', '上海', '北京', '四川', '江苏'][Math.abs([...name].reduce((sum, char) => sum + char.charCodeAt(0), 0)) % 6];
+const dailyLifeFrames = [
+  'https://images.unsplash.com/photo-1495195134817-aeb325a55b65?w=600&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1518391846015-55a9cc003b25?w=600&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1519608487953-e999c86e7455?w=600&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=600&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=600&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1494526585095-c41746248156?w=600&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=800&fit=crop',
+  'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=800&fit=crop',
+];
+const dailyLifeVideos = [
+  'https://videos.pexels.com/video-files/853889/853889-hd_1920_1080_25fps.mp4',
+  'https://videos.pexels.com/video-files/2795749/2795749-uhd_2560_1440_25fps.mp4',
+  'https://videos.pexels.com/video-files/3209828/3209828-uhd_2560_1440_25fps.mp4',
+  'https://videos.pexels.com/video-files/855564/855564-hd_1920_1080_24fps.mp4',
+  'https://videos.pexels.com/video-files/1721294/1721294-hd_1920_1080_25fps.mp4',
+  'https://videos.pexels.com/video-files/2103099/2103099-hd_1920_1080_30fps.mp4',
+  'https://videos.pexels.com/video-files/3195394/3195394-hd_1920_1080_25fps.mp4',
+  'https://videos.pexels.com/video-files/3255275/3255275-hd_1920_1080_25fps.mp4',
+  'https://videos.pexels.com/video-files/3769033/3769033-hd_1920_1080_25fps.mp4',
+  'https://videos.pexels.com/video-files/4496268/4496268-hd_1920_1080_25fps.mp4',
+  'https://videos.pexels.com/video-files/3752507/3752507-hd_1920_1080_24fps.mp4',
+  'https://videos.pexels.com/video-files/4782135/4782135-hd_1920_1080_25fps.mp4',
+];
+const dailyLifeCaptions = [
+  '今天的第一口早餐',
+  '下班路上的风',
+  '雨后路面倒影',
+  '地铁窗外一秒',
+  '厨房里的热气',
+  '深夜还亮的灯',
+  '午后三点影子',
+  '便利店门口',
+  '桌面没来得及收',
+  '回家前的天空',
+  '和朋友碰个头',
+  '新鞋第一次出门',
+];
+const dailyLifeUsers = ['林野', 'Mia', '周屿', '南川', 'Echo', '阿泽', '小北', '苏苏', '张震', 'Dear', 'Ann', 'Lucas'];
 
 const BottomNav = ({ active, setScreen, onPlusClick }: { 
   active: Screen, 
@@ -1507,9 +1551,8 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                       key={i} 
                       className="aspect-[3/4] bg-dark relative overflow-hidden group/item"
                     >
-                      <div className="absolute inset-0 bg-white/5 flex items-center justify-center">
-                        <Zap size={24} className="text-white/5 fill-white/5" />
-                      </div>
+                      <img src={dailyLifeFrames[i]} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/10" />
                       <div className="absolute top-3 left-3 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-lg border border-white/5">
                         <p className="text-[9px] font-black text-white/50 tracking-tighter uppercase">Scene {i+1}</p>
                       </div>
@@ -1706,13 +1749,27 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                         }}
                         className="aspect-square rounded-[22px] bg-white/5 border border-white/10 overflow-hidden active:scale-90 transition-transform relative shadow-lg"
                       >
-                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topic.id + i}`} alt="" className="w-full h-full object-cover" />
-                        <span className="absolute bottom-1 left-1 right-1 rounded-full bg-black/40 py-0.5 text-[7px] font-black text-white/60">已加入</span>
+                        <img src={dailyLifeFrames[i % dailyLifeFrames.length]} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
+                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topic.id + i}`} alt="" className="absolute left-1.5 top-1.5 h-6 w-6 rounded-full border border-white/40 bg-white/80 object-cover" />
+                        <span className="absolute bottom-1 left-1 right-1 rounded-full bg-black/45 py-0.5 text-[7px] font-black text-white/75 backdrop-blur-sm">已加入</span>
                       </button>
                     ) : (
-                      <div key={i} className="aspect-square rounded-[22px] border border-dashed border-white/10 bg-white/[0.025] flex items-center justify-center">
-                        <Plus size={16} className="text-white/12" />
-                      </div>
+                      <button
+                        key={i}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsInviteModalOpen(true);
+                        }}
+                        className="aspect-square rounded-[22px] border border-white/10 bg-white/[0.025] overflow-hidden active:scale-90 transition-transform relative shadow-lg"
+                      >
+                        <img src={dailyLifeFrames[i % dailyLifeFrames.length]} alt="" className="absolute inset-0 h-full w-full object-cover opacity-80" />
+                        <div className="absolute inset-0 bg-black/45 backdrop-blur-[1px]" />
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-white">
+                          <Plus size={17} strokeWidth={3} />
+                          <span className="text-[8px] font-black">邀请好友</span>
+                        </div>
+                      </button>
                     )
                   ))}
                 </div>
@@ -3450,6 +3507,9 @@ const CircleScreen = ({
   const [isHeatingModalOpen, setIsHeatingModalOpen] = useState(false);
   const [isGiftDonorModalOpen, setIsGiftDonorModalOpen] = useState(false);
   const [selectedShareUserIds, setSelectedShareUserIds] = useState<Set<string>>(new Set());
+  const [showClearScreenHint, setShowClearScreenHint] = useState(true);
+  const gestureStartRef = useRef<{ x: number; y: number } | null>(null);
+  const ignoreNextClickRef = useRef(false);
 
   const toggleShareUser = (id: string) => {
     const next = new Set(selectedShareUserIds);
@@ -3470,6 +3530,37 @@ const CircleScreen = ({
       clearTimeout(longPressTimer);
       setLongPressTimer(null);
     }
+  };
+
+  const startPointerGesture = (event: React.PointerEvent<HTMLElement>) => {
+    gestureStartRef.current = { x: event.clientX, y: event.clientY };
+    startLongPress();
+  };
+
+  const endPointerGesture = (event: React.PointerEvent<HTMLElement>) => {
+    endLongPress();
+
+    const start = gestureStartRef.current;
+    gestureStartRef.current = null;
+    if (!start) return;
+
+    const deltaX = event.clientX - start.x;
+    const deltaY = event.clientY - start.y;
+    if (deltaX > 72 && Math.abs(deltaY) < 64) {
+      ignoreNextClickRef.current = true;
+      setShowClearScreenHint(false);
+      if (!isPureMode) {
+        setIsPureMode(true);
+        showToast('已进入清屏模式，右下角按钮可恢复');
+      } else {
+        showToast('已是清屏模式');
+      }
+    }
+  };
+
+  const cancelPointerGesture = () => {
+    endLongPress();
+    gestureStartRef.current = null;
   };
 
   const handleShare = (topic: Topic) => {
@@ -3519,14 +3610,8 @@ const CircleScreen = ({
               </button>
             ) : (
               <>
-                 <button
-                    onClick={(e) => { e.stopPropagation(); setIsGiftDrawerOpen(true); }}
-                    className="flex items-center gap-2 glass-pill px-3 py-1.5 rounded-full pointer-events-auto bg-black/20 active:scale-95 transition-transform"
-                 >
-                    <Gift size={14} className="text-indigo-400" />
-                    <span className="text-[11px] font-black tracking-widest text-white shadow-sm">{diamondBalance.toLocaleString()}</span>
-                 </button>
-                 <GiftDonorStack gifts={MOCK_GIFT_RECORDS.slice(0, 5)} onClick={() => setIsGiftDonorDetailModalOpen(true)} />
+                 <div className="w-10 h-10" />
+                 <div className="w-10 h-10" />
               </>
             )}
           </motion.header>
@@ -3537,6 +3622,26 @@ const CircleScreen = ({
               onClose={() => setIsGiftDonorDetailModalOpen(false)}
               gifts={MOCK_GIFT_RECORDS}
             />
+
+      {!isPureMode && showClearScreenHint && (
+        <div className="pointer-events-none absolute right-2 bottom-[92px] z-50 max-w-[132px] rounded-full bg-black/35 px-3 py-1.5 text-center text-[10px] font-black text-white/80 shadow-lg backdrop-blur-md border border-white/10">
+          右滑或点清屏
+        </div>
+      )}
+
+      {isPureMode && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsPureMode(false);
+            showToast('已退出纯净模式');
+          }}
+          className="absolute right-4 bottom-[116px] z-50 flex h-9 w-9 items-center justify-center rounded-full text-white shadow-lg drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] active:scale-95 transition-transform"
+          aria-label="退出清屏模式"
+        >
+          <FileOutput size={28} strokeWidth={2.5} />
+        </button>
+      )}
 
       {/* Full Screen Scroll Container */}
       <main className="h-full overflow-y-scroll snap-y snap-mandatory no-scrollbar pb-24">
@@ -3552,11 +3657,15 @@ const CircleScreen = ({
             <section 
               key={`${topic.id}-${i}`} 
               className="h-full w-full snap-start relative flex flex-col justify-end pb-12 overflow-hidden"
-              onPointerDown={startLongPress}
-              onPointerUp={endLongPress}
-              onPointerLeave={endLongPress}
+              onPointerDown={startPointerGesture}
+              onPointerUp={endPointerGesture}
+              onPointerLeave={cancelPointerGesture}
               onClick={(e) => {
                 e.stopPropagation();
+                if (ignoreNextClickRef.current) {
+                  ignoreNextClickRef.current = false;
+                  return;
+                }
                 setIsPaused(!isPaused);
               }}
             >
@@ -3580,8 +3689,49 @@ const CircleScreen = ({
               <div className={`absolute inset-0 bg-gradient-to-br transition-all duration-1000 ${
                 topic.tone === 'blue' ? 'from-indigo-600 via-indigo-900' : 'from-amber-600 via-amber-900'
               } to-black z-0 shadow-inner`}>
+                <div className="absolute inset-0 grid grid-cols-2 grid-rows-6 gap-px bg-black">
+                  {Array.from({ length: 12 }).map((_, frameIndex) => {
+                    const frameSeed = (i * 3 + frameIndex) % dailyLifeFrames.length;
+                    const userName = dailyLifeUsers[frameSeed];
+
+                    return (
+                      <div key={frameIndex} className="relative overflow-hidden bg-white/5">
+                        <video
+                          src={dailyLifeVideos[frameSeed]}
+                          poster={dailyLifeFrames[frameSeed]}
+                          className="h-full w-full object-cover"
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          preload="metadata"
+                          onTimeUpdate={(event) => {
+                            if (event.currentTarget.currentTime > 5) {
+                              event.currentTarget.currentTime = 0;
+                            }
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/8 to-black/20" />
+                        <div className="absolute inset-x-3 top-1/2 -translate-y-1/2">
+                          <p className="line-clamp-2 text-center text-[13px] font-black leading-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.55)]">
+                            {dailyLifeCaptions[frameSeed]}
+                          </p>
+                        </div>
+                        <div className="absolute bottom-2 left-2 right-2 flex min-w-0 items-center gap-1.5">
+                          <img
+                            src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`}
+                            alt=""
+                            className="h-5 w-5 shrink-0 rounded-full border border-white/45 bg-white/80 object-cover"
+                          />
+                          <span className="truncate text-[9px] font-black text-white/88 drop-shadow-[0_1px_6px_rgba(0,0,0,0.55)]">
+                            {userName}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
                 <div className={`absolute inset-0 bg-black/20 transition-opacity ${isPaused ? 'opacity-100' : 'opacity-0'}`}></div>
-                <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black to-transparent opacity-95"></div>
               </div>
 
               {/* Interaction Bar (Fixed Right) */}
@@ -3667,6 +3817,21 @@ const CircleScreen = ({
                         {isMyWorkMode ? '更多' : (topic.shares && topic.shares !== '0' ? topic.shares : '分享')}
                       </span>
                     </div>
+
+                    <div className="flex flex-col items-center gap-1">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowClearScreenHint(false);
+                          setIsPureMode(true);
+                          showToast('已进入清屏模式，右下角按钮可恢复');
+                        }}
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-white active:scale-95 transition-transform drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
+                      >
+                        <FileX size={28} strokeWidth={2.5} />
+                      </button>
+                      <span className="text-[10px] font-black text-white/80">清屏</span>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -3684,7 +3849,7 @@ const CircleScreen = ({
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 20 }}
-                    className="relative z-10 px-6 pb-6 space-y-2 max-w-[80%] pointer-events-auto"
+                    className="relative z-10 px-6 -mb-7 space-y-1.5 max-w-[80%] pointer-events-auto"
                   >
                     <p className="text-white font-medium text-lg leading-snug flex items-center gap-2 flex-wrap">
                       <span>{topic.title}</span>
@@ -4002,11 +4167,11 @@ const CircleScreen = ({
                   </div>
                   <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">微信好友</span>
                 </button>
-                <button key="drawer2-moments" className="flex flex-col items-center gap-2 group" onClick={() => { showToast('正在跳转朋友圈...'); setIsShareDrawerOpen(false); }}>
-                  <div className="w-12 h-12 bg-[#07C160]/10 border border-[#07C160]/20 rounded-2xl flex items-center justify-center text-[#07C160] active:scale-95 transition-transform">
-                    <Users size={24} />
+                <button key="drawer2-gift" className="flex flex-col items-center gap-2 group" onClick={() => { setIsShareDrawerOpen(false); setIsGiftDrawerOpen(true); }}>
+                  <div className="w-12 h-12 bg-[#FE2C55]/10 border border-[#FE2C55]/20 rounded-2xl flex items-center justify-center text-[#FE2C55] active:scale-95 transition-transform">
+                    <Gift size={24} />
                   </div>
-                  <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">朋友圈</span>
+                  <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">赠送</span>
                 </button>
                 <button key="drawer2-copy-link" className="flex flex-col items-center gap-2 group" onClick={() => { showToast('已复制链接'); setIsShareDrawerOpen(false); }}>
                   <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/60 active:scale-95 transition-transform">
