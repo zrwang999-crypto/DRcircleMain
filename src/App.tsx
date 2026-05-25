@@ -288,6 +288,13 @@ const HomeScreen = ({
 
   const nextTopic = () => setCurrentIndex((prev) => (prev + 1) % homeTopics.length);
   const prevTopic = () => setCurrentIndex((prev) => (prev - 1 + homeTopics.length) % homeTopics.length);
+  const openGrowthTopic = (event?: React.MouseEvent<HTMLButtonElement> | React.PointerEvent<HTMLButtonElement>) => {
+    event?.preventDefault();
+    event?.stopPropagation();
+    setSelectedTopic(currentTopic);
+    dismissGrowthPrompt();
+    setScreen('topic-detail');
+  };
   
   return (
     <div className="flex flex-col h-full bg-dark font-sans pt-8 relative overflow-hidden">
@@ -469,11 +476,10 @@ const HomeScreen = ({
               </div>
 
               <button
-                onClick={() => {
-                  setSelectedTopic(currentTopic);
-                  dismissGrowthPrompt();
-                  setScreen('topic-detail');
-                }}
+                data-testid="growth-topic-card"
+                onClick={openGrowthTopic}
+                onPointerDownCapture={openGrowthTopic}
+                onPointerUp={openGrowthTopic}
                 className="mt-5 w-full rounded-[24px] bg-white px-4 py-4 text-left shadow-sm active:scale-[0.99] transition-transform"
               >
                 <div className="flex items-center justify-between">
@@ -1997,6 +2003,7 @@ const MeScreen = ({ setScreen, profile, diamondBalance, energyBalance, likedCoun
   const [activeGallery, setActiveGallery] = useState<'works' | 'likes' | 'saved'>('works');
   const [isGrowthDialogOpen, setIsGrowthDialogOpen] = useState(false);
   const myStartedTopicIds = new Set(['1', '4', '6']);
+  const closestFormingTopic = TOPICS.find((topic) => topic.id === '1') || TOPICS.find((topic) => topic.status !== 'completed') || TOPICS[0];
 
   const getWorkBadge = (topic: Topic) => {
     if (topic.creator === CURRENT_USER.name || myStartedTopicIds.has(topic.id)) return '我发起的';
@@ -2005,6 +2012,15 @@ const MeScreen = ({ setScreen, profile, diamondBalance, energyBalance, likedCoun
   };
 
   const isPendingWork = (topic: Topic) => topic.status !== 'completed';
+  const openGrowthTopic = (event?: React.MouseEvent<HTMLButtonElement> | React.PointerEvent<HTMLButtonElement>) => {
+    event?.preventDefault();
+    event?.stopPropagation();
+    setSelectedTopic(closestFormingTopic);
+    setCircleIsMyWorkMode(false);
+    setCircleInitialTopicId(undefined);
+    setIsGrowthDialogOpen(false);
+    setScreen('topic-detail');
+  };
 
   const openWork = (topic: Topic) => {
     setSelectedTopic(topic);
@@ -2303,21 +2319,27 @@ const MeScreen = ({ setScreen, profile, diamondBalance, energyBalance, likedCoun
               </div>
 
               <button
-                onClick={() => setIsGrowthDialogOpen(false)}
+                data-testid="growth-topic-card"
+                onClick={openGrowthTopic}
+                onPointerDownCapture={openGrowthTopic}
+                onPointerUp={openGrowthTopic}
                 className="mt-5 w-full rounded-[24px] bg-white px-4 py-4 text-left shadow-sm active:scale-[0.99] transition-transform"
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-[11px] font-black text-[#8f7f6d]">最接近成圈</p>
-                    <p className="mt-1 text-sm font-black text-[#2f261d]">今天的城市声音</p>
+                    <p className="mt-1 text-sm font-black text-[#2f261d]">{closestFormingTopic.title}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xl font-black text-[#b4834a]">6/8</p>
+                    <p className="text-xl font-black text-[#b4834a]">{closestFormingTopic.joinedCount}/{closestFormingTopic.targetCount}</p>
                     <p className="text-[9px] font-black text-[#aa9a86]">人数</p>
                   </div>
                 </div>
                 <div className="mt-4 h-2 rounded-full bg-[#ebe2d4] overflow-hidden">
-                  <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-[#edbd79] to-[#ff2e67]" />
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-[#edbd79] to-[#ff2e67]"
+                    style={{ width: `${Math.min(100, (closestFormingTopic.joinedCount / closestFormingTopic.targetCount) * 100)}%` }}
+                  />
                 </div>
               </button>
 
