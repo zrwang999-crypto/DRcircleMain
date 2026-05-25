@@ -45,7 +45,8 @@ import {
   Pencil,
   Image as ImageIcon,
   Mic,
-  Smile
+  Smile,
+  ClipboardCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { TOPICS, CURRENT_USER, GIFTS, SHOP_ITEMS, SHARE_FRIENDS, MOCK_GIFT_RECORDS } from './constants';
@@ -1990,9 +1991,7 @@ const MeScreen = ({ setScreen, profile, diamondBalance, energyBalance, likedCoun
   return (
     <div className="flex flex-col h-full bg-[radial-gradient(circle_at_top,#fffaf4_0%,#f7f2ea_42%,#f2ebe1_100%)] pt-8 text-[#2f261d]">
       <header className="p-6 flex items-center justify-between sticky top-0 bg-[#f9f5ef]/90 backdrop-blur-xl z-20">
-        <button onClick={() => { setInitialNetworkTab('friends'); setScreen('network-list'); }} className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white/82 text-[#4f3d2d] shadow-sm active:scale-95 transition-transform">
-          <Users size={20} />
-        </button>
+        <div className="w-10 h-10" />
         <h2 className="font-bold text-[#2f261d] text-lg tracking-tight">我的</h2>
         <button onClick={() => setScreen('settings')} className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white/82 text-[#4f3d2d] shadow-sm active:scale-95 transition-transform">
           <Settings size={20} />
@@ -2106,18 +2105,19 @@ const MeScreen = ({ setScreen, profile, diamondBalance, energyBalance, likedCoun
 
         <button
           onClick={() => setIsGrowthDialogOpen(true)}
-          className="mt-4 w-full rounded-[24px] border border-[#eadfce] bg-white/82 px-4 py-4 text-left shadow-sm active:scale-[0.99] transition-transform"
+          className="mt-4 w-full rounded-[28px] bg-white/90 px-4 py-3 text-left shadow-[0_10px_28px_rgba(103,81,58,0.10)] active:scale-[0.99] transition-transform"
         >
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-[10px] font-black uppercase tracking-[0.22em] text-[#b4834a]">今日成长</p>
-              <h3 className="mt-1 text-xl font-black tracking-tight text-[#2f261d]">2/3 已完成</h3>
-              <p className="mt-1 text-[11px] font-bold text-[#8f7f6d]">参与一个待成圈话题，就能点亮今日记录。</p>
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#2f261d] text-white">
+              <ClipboardCheck size={22} strokeWidth={2.5} />
             </div>
-            <div className="flex shrink-0 items-center gap-2">
-              <span className="rounded-full bg-[#fff1d8] px-3 py-1 text-[11px] font-black text-[#b4834a]">+170</span>
-              <ChevronRight size={18} className="text-[#bcae9d]" />
+            <div className="min-w-0 flex-1">
+              <h3 className="text-base font-black leading-tight tracking-tight text-[#2f261d]">今日成长 2/3</h3>
+              <p className="mt-0.5 truncate text-[12px] font-bold text-[#8f7f6d]">参与一个待成圈话题，可点亮今日记录</p>
             </div>
+            <span className="shrink-0 rounded-full bg-[#FE2C55] px-5 py-3 text-sm font-black text-white shadow-[0_10px_22px_rgba(254,44,85,0.22)]">
+              去完成
+            </span>
           </div>
         </button>
 
@@ -3577,7 +3577,7 @@ const CircleScreen = ({
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
-                    className="absolute right-4 bottom-14 z-20 flex flex-col items-center gap-6"
+                    className="absolute right-2 bottom-16 z-20 flex flex-col items-center gap-4"
                   >
                     <div className="relative mb-2">
                       <div 
@@ -3598,43 +3598,43 @@ const CircleScreen = ({
                       </button>
                     </div>
 
-                    <div className="flex flex-col items-center gap-1.5">
+                    <div className="flex flex-col items-center gap-1">
                       <button 
                         onClick={(e) => { e.stopPropagation(); toggleLike(topic.id); }}
-                        className={`w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all active:scale-90 ${
-                          isLiked ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' : 'bg-white/10 text-white border border-white/5'
+                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] ${
+                          isLiked ? 'text-red-500' : 'text-white'
                         }`}
                       >
-                        <Heart size={24} className={isLiked ? 'fill-current' : ''} />
+                        <Heart size={28} strokeWidth={2.5} className="fill-current" />
                       </button>
                       <span className="text-[10px] font-black text-white/80">{topic.likes}</span>
                     </div>
 
-                    <div className="flex flex-col items-center gap-1.5">
+                    <div className="flex flex-col items-center gap-1">
                       <button 
                         onClick={(e) => { e.stopPropagation(); setShowComments(true); }}
-                        className="w-12 h-12 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-md text-white border border-white/5 active:scale-95 transition-transform"
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-white active:scale-95 transition-transform drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
                       >
-                        <MessageCircle size={24} />
+                        <MessageCircle size={28} strokeWidth={2.5} className="fill-current" />
                       </button>
                       <span className="text-[10px] font-black text-white/80">42</span>
                     </div>
 
-                    <div className="flex flex-col items-center gap-1.5">
+                    <div className="flex flex-col items-center gap-1">
                       <button 
                         onClick={(e) => { e.stopPropagation(); toggleFavorite(topic.id); }}
-                        className={`w-12 h-12 rounded-full flex items-center justify-center backdrop-blur-md transition-all active:scale-90 ${
-                          isFavorite ? 'bg-gold text-dark shadow-lg shadow-gold/20' : 'bg-white/10 text-white border border-white/5'
+                        className={`w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] ${
+                          isFavorite ? 'text-gold' : 'text-white'
                         }`}
                       >
-                        <Star size={24} className={isFavorite ? 'fill-current' : ''} />
+                        <Star size={28} strokeWidth={2.5} className="fill-current" />
                       </button>
                       <span className="text-[10px] font-black text-white/80">
                         {topic.bookmarks && topic.bookmarks !== '0' ? topic.bookmarks : '收藏'}
                       </span>
                     </div>
  
-                    <div className="flex flex-col items-center gap-1.5">
+                    <div className="flex flex-col items-center gap-1">
                       <button 
                         onClick={(e) => { 
                           e.stopPropagation(); 
@@ -3645,9 +3645,9 @@ const CircleScreen = ({
                             handleShare(topic);
                           }
                         }}
-                        className="w-12 h-12 rounded-full flex items-center justify-center bg-white/10 backdrop-blur-md text-white border border-white/5 active:scale-95 transition-transform"
+                        className="w-9 h-9 rounded-full flex items-center justify-center text-white active:scale-95 transition-transform drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
                       >
-                        {isMyWorkMode ? <MoreHorizontal size={24} /> : <CornerUpRight size={24} />}
+                        {isMyWorkMode ? <MoreHorizontal size={28} strokeWidth={3} /> : <CornerUpRight size={28} strokeWidth={3} />}
                       </button>
                       <span className="text-[10px] font-black text-white/80">
                         {isMyWorkMode ? '更多' : (topic.shares && topic.shares !== '0' ? topic.shares : '分享')}
