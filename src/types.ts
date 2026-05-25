@@ -40,18 +40,18 @@ export interface User {
   ipLocation?: string;
 }
 
-export type Screen = 
+export type Screen =
   | 'splash'
   | 'login'
-  | 'home' 
-  | 'topic-detail' 
+  | 'home'
+  | 'topic-detail'
   | 'create-circle'
   | 'create-and-shoot'
   | 'create-success'
   | 'join'
   | 'join-success'
-  | 'circle' 
-  | 'content-detail' 
+  | 'circle'
+  | 'content-detail'
   | 'messages'
   | 'dm'
   | 'user-profile'
@@ -77,5 +77,8 @@ export type Screen =
   | 'account-profile'
   | 'privacy-policy'
   | 'notification-settings'
+  | 'blacklist'
+  | 'report-user'
+  | 'report-success'
   | 'feedback'
   | 'feedback-detail';

@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Camera, 
-  MapPin, 
-  Users, 
-  MessageCircle, 
-  User as UserIcon, 
-  Flame, 
-  ChevronRight, 
+import {
+  Camera,
+  MapPin,
+  Users,
+  MessageCircle,
+  User as UserIcon,
+  Flame,
+  ChevronRight,
   ChevronLeft,
   ChevronDown,
-  Heart, 
-  CornerUpRight, 
+  Heart,
+  CornerUpRight,
   ArrowLeft,
   Bell,
   Settings,
@@ -64,13 +64,13 @@ const SpotlightMarquee = ({ spotlightTopics, onSelect }: { spotlightTopics: Topi
     <div className="w-full h-12 flex items-center overflow-hidden relative">
       <div className="absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-dark to-transparent z-10"></div>
       <div className="absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-dark to-transparent z-10"></div>
-      <motion.div 
+      <motion.div
         animate={{ x: [0, -900] }}
         transition={{ duration: 34, repeat: Infinity, ease: "linear" }}
         className="flex whitespace-nowrap gap-3 items-center px-4"
       >
         {[...spotlightTopics, ...spotlightTopics, ...spotlightTopics, ...spotlightTopics, ...spotlightTopics].map((topic, i) => (
-          <button 
+          <button
             key={`${topic.id}-${i}`}
             onClick={() => onSelect(topic)}
             className="h-9 px-4 rounded-full bg-white/10 border border-white/15 backdrop-blur-xl flex items-center gap-2.5 group shadow-sm"
@@ -149,16 +149,16 @@ const dailyLifeCaptions = [
 ];
 const dailyLifeUsers = ['林野', 'Mia', '周屿', '南川', 'Echo', '阿泽', '小北', '苏苏', '张震', 'Dear', 'Ann', 'Lucas'];
 
-const BottomNav = ({ active, setScreen, onPlusClick }: { 
-  active: Screen, 
-  setScreen: (s: Screen) => void, 
+const BottomNav = ({ active, setScreen, onPlusClick }: {
+  active: Screen,
+  setScreen: (s: Screen) => void,
   onPlusClick: () => void,
 }) => {
   const navItems: { id: Screen, label: string, icon: typeof UserIcon }[] = [
     { id: 'home', label: '今日', icon: Flame },
     { id: 'circle', label: 'DR圈', icon: Users },
   ];
-  
+
   const rightNavItems: { id: Screen, label: string, icon: typeof UserIcon }[] = [
     { id: 'messages', label: '消息', icon: MessageCircle },
     { id: 'me', label: '我的', icon: UserIcon },
@@ -215,7 +215,7 @@ const BottomNav = ({ active, setScreen, onPlusClick }: {
         ))}
       </div>
 
-      <button 
+      <button
         onClick={onPlusClick}
         className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-all -mt-12 border-[6px] box-content z-50 ${
           isLightNav
@@ -249,22 +249,23 @@ const BottomNav = ({ active, setScreen, onPlusClick }: {
 
 // --- Home Screen ---
 
-const HomeScreen = ({ 
-  setScreen, 
-  setSelectedTopic, 
-  topics, 
-  savedTopicIds, 
-  toggleFavorite, 
-  likedTopicIds, 
-  toggleLike, 
-  setSelectedUserName, 
-  spotlightTopicIds, 
-  spotlightTopic, 
+const HomeScreen = ({
+  setScreen,
+  setSelectedTopic,
+  topics,
+  savedTopicIds,
+  toggleFavorite,
+  likedTopicIds,
+  toggleLike,
+  setSelectedUserName,
+  spotlightTopicIds,
+  spotlightTopic,
   showToast,
   showGrowthPrompt,
   dismissGrowthPrompt,
-}: { 
-  setScreen: (s: Screen) => void, 
+  setCircleInitialTopicId,
+}: {
+  setScreen: (s: Screen) => void,
   setSelectedTopic: (t: Topic) => void,
   topics: Topic[],
   savedTopicIds: Set<string>,
@@ -277,6 +278,7 @@ const HomeScreen = ({
   showToast: (m: string) => void,
   showGrowthPrompt: boolean,
   dismissGrowthPrompt: () => void,
+  setCircleInitialTopicId: (id: string | undefined) => void,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const homeTopics = topics.filter(t => t.status !== 'completed');
@@ -288,23 +290,22 @@ const HomeScreen = ({
 
   const nextTopic = () => setCurrentIndex((prev) => (prev + 1) % homeTopics.length);
   const prevTopic = () => setCurrentIndex((prev) => (prev - 1 + homeTopics.length) % homeTopics.length);
-  const openGrowthTopic = (event?: React.MouseEvent<HTMLButtonElement> | React.PointerEvent<HTMLButtonElement>) => {
-    event?.preventDefault();
-    event?.stopPropagation();
-    setSelectedTopic(currentTopic);
-    dismissGrowthPrompt();
-    setScreen('topic-detail');
-  };
-  
+
   return (
     <div className="flex flex-col h-full bg-dark font-sans pt-8 relative overflow-hidden">
       <div className="pt-6">
-        <SpotlightMarquee 
-          spotlightTopics={marqueeTopics} 
+        <SpotlightMarquee
+          spotlightTopics={marqueeTopics}
           onSelect={(topic) => {
+            if (topic.status === 'completed') {
+              setCircleInitialTopicId(topic.id);
+              setScreen('circle');
+              return;
+            }
+            setCircleInitialTopicId(undefined);
             setSelectedTopic(topic);
             setScreen('topic-detail');
-          }} 
+          }}
         />
       </div>
 
@@ -349,7 +350,7 @@ const HomeScreen = ({
             <ChevronRight size={18} />
           </button>
 
-          <motion.div 
+          <motion.div
             key={currentTopic.id}
             layoutId={`topic-card-${currentTopic.id}`}
             initial={{ opacity: 0, y: 15, scale: 0.98 }}
@@ -389,9 +390,9 @@ const HomeScreen = ({
             <div className="absolute inset-0 bg-black/50 pointer-events-none"></div>
             <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black via-black/80 to-transparent opacity-100"></div>
             <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-black/40 to-transparent opacity-80"></div>
-            <div className="absolute inset-0 opacity-20 pointer-events-none" 
+            <div className="absolute inset-0 opacity-20 pointer-events-none"
                  style={{ backgroundImage: 'radial-gradient(circle at 70% 30%, white 0%, transparent 100%)' }}></div>
-            
+
             <div className="flex justify-between items-start z-10 pt-2">
               <div className="flex flex-col gap-1.5">
                 <span className="w-fit bg-white/10 backdrop-blur-md px-3 py-1 rounded-full text-[11px] font-black tracking-widest uppercase text-white border border-white/10 shadow-sm">
@@ -399,7 +400,7 @@ const HomeScreen = ({
                 </span>
               </div>
               <div className="flex gap-2 mt-1">
-                <button 
+                <button
                   onClick={(e) => { e.stopPropagation(); toggleFavorite(currentTopic.id); }}
                   className={`w-10 h-10 glass-pill rounded-xl flex items-center justify-center transition-colors ${isFavorite ? 'bg-gold text-dark border-dark shadow-lg shadow-gold/20' : ''}`}
                 >
@@ -476,10 +477,11 @@ const HomeScreen = ({
               </div>
 
               <button
-                data-testid="growth-topic-card"
-                onClick={openGrowthTopic}
-                onPointerDownCapture={openGrowthTopic}
-                onPointerUp={openGrowthTopic}
+                onClick={() => {
+                  setSelectedTopic(currentTopic);
+                  dismissGrowthPrompt();
+                  setScreen('topic-detail');
+                }}
                 className="mt-5 w-full rounded-[24px] bg-white px-4 py-4 text-left shadow-sm active:scale-[0.99] transition-transform"
               >
                 <div className="flex items-center justify-between">
@@ -545,14 +547,14 @@ const HomeScreen = ({
   );
 };
 
-const HeatingConfirmationModal = ({ 
-  isOpen, 
-  onClose, 
-  onConfirm 
-}: { 
-  isOpen: boolean, 
-  onClose: () => void, 
-  onConfirm: () => void 
+const HeatingConfirmationModal = ({
+  isOpen,
+  onClose,
+  onConfirm
+}: {
+  isOpen: boolean,
+  onClose: () => void,
+  onConfirm: () => void
 }) => {
   return (
     <AnimatePresence>
@@ -581,7 +583,7 @@ const HeatingConfirmationModal = ({
                   加热后，会有更多人能留意到该作品
                 </p>
               </div>
-              
+
               <div className="bg-white/5 rounded-2xl p-4 text-left space-y-3">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-white/40">消耗钻石</span>
@@ -594,13 +596,13 @@ const HeatingConfirmationModal = ({
               </div>
 
               <div className="flex gap-3">
-                <button 
+                <button
                   onClick={onClose}
                   className="flex-1 h-14 bg-white/5 text-white/60 rounded-2xl font-bold text-sm active:scale-95 transition-transform"
                 >
                   取消
                 </button>
-                <button 
+                <button
                   onClick={() => {
                     onConfirm();
                     onClose();
@@ -618,19 +620,19 @@ const HeatingConfirmationModal = ({
   );
 };
 
-const FriendSelectionModal = ({ 
-  isOpen, 
-  onClose, 
-  onInvite, 
-  remainingCount 
-}: { 
-  isOpen: boolean, 
-  onClose: () => void, 
-  onInvite: (selectedNames: string[]) => void, 
-  remainingCount: number 
+const FriendSelectionModal = ({
+  isOpen,
+  onClose,
+  onInvite,
+  remainingCount
+}: {
+  isOpen: boolean,
+  onClose: () => void,
+  onInvite: (selectedNames: string[]) => void,
+  remainingCount: number
 }) => {
   const [selectedFriends, setSelectedFriends] = useState<Set<string>>(new Set());
-  
+
   const FRIENDS = [
     { name: '林野', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=128&h=128&fit=crop' },
     { name: 'Mia', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=128&h=128&fit=crop' },
@@ -674,22 +676,22 @@ const FriendSelectionModal = ({
                 <h3 className="text-xl font-bold text-white">选择好友</h3>
                 <p className="text-xs text-white/40 mt-1">还可以邀请 {remainingCount - selectedFriends.size} 位好友</p>
               </div>
-              <button 
+              <button
                 onClick={onClose}
                 className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/50"
               >
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto px-6 py-2 space-y-4">
               {FRIENDS.map(friend => (
                 <button
                   key={friend.name}
                   onClick={() => handleToggle(friend.name)}
                   className={`w-full flex items-center gap-4 p-4 rounded-3xl border transition-all ${
-                    selectedFriends.has(friend.name) 
-                    ? 'bg-gold/10 border-gold shadow-[0_0_20px_rgba(255,184,0,0.1)]' 
+                    selectedFriends.has(friend.name)
+                    ? 'bg-gold/10 border-gold shadow-[0_0_20px_rgba(255,184,0,0.1)]'
                     : 'bg-white/5 border-white/5'
                   }`}
                 >
@@ -714,8 +716,8 @@ const FriendSelectionModal = ({
                   onClose();
                 }}
                 className={`w-full h-14 rounded-2xl font-black transition-all active:scale-95 flex items-center justify-center gap-2 ${
-                  selectedFriends.size > 0 
-                  ? 'bg-gold text-dark' 
+                  selectedFriends.size > 0
+                  ? 'bg-gold text-dark'
                   : 'bg-white/10 text-white/20'
                 }`}
               >
@@ -731,16 +733,16 @@ const FriendSelectionModal = ({
 
 type Visibility = 'public' | 'friends' | 'private' | 'selected';
 
-const VisibilitySelectorDrawer = ({ 
-  isOpen, 
-  onClose, 
-  visibility, 
-  setVisibility, 
-  selectedFriendIds, 
-  setSelectedFriendIds 
-}: { 
-  isOpen: boolean, 
-  onClose: () => void, 
+const VisibilitySelectorDrawer = ({
+  isOpen,
+  onClose,
+  visibility,
+  setVisibility,
+  selectedFriendIds,
+  setSelectedFriendIds
+}: {
+  isOpen: boolean,
+  onClose: () => void,
   visibility: Visibility,
   setVisibility: (v: Visibility) => void,
   selectedFriendIds: Set<string>,
@@ -770,14 +772,14 @@ const VisibilitySelectorDrawer = ({
     <AnimatePresence>
       {isOpen && (
         <>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm z-[110]"
           />
-          <motion.div 
+          <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -788,18 +790,18 @@ const VisibilitySelectorDrawer = ({
             <header className="p-6 pt-2 flex items-center justify-between border-b border-white/[0.03]">
               <button onClick={onClose} className="text-white/40 font-bold text-xs uppercase tracking-widest px-2">取消</button>
               <h3 className="font-black text-white text-sm tracking-[0.3em] uppercase">谁可以看</h3>
-              <button 
-                onClick={onClose} 
+              <button
+                onClick={onClose}
                 className="px-6 py-2 bg-gold text-dark rounded-full text-xs font-black shadow-lg shadow-gold/20 active:scale-95 transition-transform"
               >
                 确定
               </button>
             </header>
-            
+
             <div className="flex-1 overflow-y-auto no-scrollbar py-4 px-6 space-y-6 pb-20">
               <div className="space-y-2">
                 {options.map((item) => (
-                  <div 
+                  <div
                     key={item.id}
                     onClick={() => setVisibility(item.id)}
                     className={`p-5 rounded-3xl border transition-all flex items-center justify-between ${visibility === item.id ? 'bg-white/10 border-white/20' : 'bg-white/5 border-white/5'}`}
@@ -822,7 +824,7 @@ const VisibilitySelectorDrawer = ({
 
               <AnimatePresence>
                 {visibility === 'selected' && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
@@ -831,7 +833,7 @@ const VisibilitySelectorDrawer = ({
                     <label className="text-[10px] font-black uppercase text-white/40 tracking-[0.2em] ml-1">选择好友</label>
                     <div className="space-y-2">
                       {friends.map(friend => (
-                        <div 
+                        <div
                           key={friend.id}
                           onClick={() => toggleFriend(friend.id)}
                           className={`flex items-center justify-between p-4 rounded-2xl border transition-all ${selectedFriendIds.has(friend.id) ? 'bg-white/10 border-white/10' : 'bg-white/5 border-white/5'}`}
@@ -860,7 +862,7 @@ const VisibilitySelectorDrawer = ({
 const GiftDonorStack = ({ gifts, onClick }: { gifts: GiftRecord[], onClick: () => void }) => {
   const topGifts = gifts.slice(0, 3);
   const remaining = gifts.length > 3 ? gifts.length - 3 : 0;
-  
+
   return (
     <button onClick={onClick} className="pointer-events-auto flex -space-x-2 items-center hover:scale-105 transition-transform bg-black/20 p-1 rounded-full border border-white/10 backdrop-blur-md">
       {topGifts.map((g, i) => (
@@ -875,14 +877,14 @@ const GiftDonorStack = ({ gifts, onClick }: { gifts: GiftRecord[], onClick: () =
   );
 };
 
-const GiftDonorDetailModal = ({ 
-  isOpen, 
-  onClose, 
-  gifts 
-}: { 
-  isOpen: boolean, 
-  onClose: () => void, 
-  gifts: GiftRecord[] 
+const GiftDonorDetailModal = ({
+  isOpen,
+  onClose,
+  gifts
+}: {
+  isOpen: boolean,
+  onClose: () => void,
+  gifts: GiftRecord[]
 }) => {
   return (
     <AnimatePresence>
@@ -915,7 +917,7 @@ const GiftDonorDetailModal = ({
                     </div>
                   ))}
                 </div>
-              <button 
+              <button
                 onClick={onClose}
                 className="w-full mt-6 h-12 bg-white/5 text-white/60 rounded-2xl font-bold text-sm active:scale-95 transition-transform"
               >
@@ -929,8 +931,8 @@ const GiftDonorDetailModal = ({
   );
 };
 
-const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite, toggleLike, isLiked, setSelectedTopic, setSelectedUserName, showToast, isSpotlighted, spotlightTopic, userVlogs, deleteVlog, setCircleInitialTopicInfo }: { 
-  topic: Topic, 
+const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite, toggleLike, isLiked, setSelectedTopic, setSelectedUserName, showToast, isSpotlighted, spotlightTopic, userVlogs, deleteVlog, setCircleInitialTopicInfo, setReportTargetName, setReportType }: {
+  topic: Topic,
   setScreen: (s: Screen) => void,
   prevScreen: Screen,
   toggleFavorite: (id: string) => void,
@@ -944,7 +946,9 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
   spotlightTopic: (id: string) => void,
   userVlogs: UserVlog[],
   deleteVlog: (id: string) => void,
-  setCircleInitialTopicInfo: (info: Partial<Topic> | undefined) => void
+  setCircleInitialTopicInfo: (info: Partial<Topic> | undefined) => void,
+  setReportTargetName: (name: string) => void,
+  setReportType: (type: 'account' | 'video') => void
 }) => {
   const [isCreatorsExpanded, setIsCreatorsExpanded] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
@@ -993,8 +997,8 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
           >
               <div className="flex justify-between items-center px-6 mb-4">
                 <h3 className="text-white text-sm font-black tracking-[0.2em] uppercase">分享给好友</h3>
-                <button 
-                  onClick={() => setIsShareDrawerOpen(false)} 
+                <button
+                  onClick={() => setIsShareDrawerOpen(false)}
                   className="w-10 h-10 flex items-center justify-center bg-white/5 rounded-full text-white/40 active:scale-95 transition-transform"
                 >
                   <X size={18} />
@@ -1004,9 +1008,9 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
               {/* Multi-select Friends List */}
               <div className="flex gap-4 overflow-x-auto no-scrollbar px-6 pb-2">
                 {SHARE_FRIENDS.map((friend) => (
-                  <button 
-                    key={friend.id} 
-                    className="flex flex-col items-center gap-2 min-w-[64px] group relative" 
+                  <button
+                    key={friend.id}
+                    className="flex flex-col items-center gap-2 min-w-[64px] group relative"
                     onClick={() => toggleShareUser(friend.id)}
                   >
                     <div className={`w-14 h-14 rounded-full overflow-hidden border-2 transition-all p-0.5 active:scale-95 ${
@@ -1016,8 +1020,8 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                     </div>
                     {/* Checkbox Overlay */}
                     <div className={`absolute top-0 right-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                        selectedShareUserIds.has(friend.id) 
-                        ? 'bg-red-primary border-red-primary opacity-100 scale-100' 
+                        selectedShareUserIds.has(friend.id)
+                        ? 'bg-red-primary border-red-primary opacity-100 scale-100'
                         : 'bg-black/20 border-white/20 opacity-40 scale-75'
                     }`}>
                       {selectedShareUserIds.has(friend.id) && <Check size={12} className="text-white" strokeWidth={4} />}
@@ -1034,13 +1038,13 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
               {/* Action Bar / Send Button */}
               <AnimatePresence>
                 {selectedShareUserIds.size > 0 && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 20 }}
                     className="px-6 py-2"
                   >
-                    <button 
+                    <button
                       onClick={() => {
                         showToast(`已向 ${selectedShareUserIds.size} 位好友发送邀请`);
                         setIsShareDrawerOpen(false);
@@ -1057,39 +1061,24 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
 
               {/* Other Sharing Channels */}
               <div className="flex gap-6 overflow-x-auto no-scrollbar px-6 pb-2">
-                <button key="drawer1-wechat" className="flex flex-col items-center gap-2 group shrink-0" onClick={() => { showToast('正在跳转微信...'); setIsShareDrawerOpen(false); }}>
-                  <div className="w-12 h-12 bg-[#07C160]/10 border border-[#07C160]/20 rounded-2xl flex items-center justify-center text-[#07C160] active:scale-95 transition-transform">
-                    <MessageCircle size={24} />
-                  </div>
-                  <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">微信好友</span>
-                </button>
-                <button key="drawer1-moments" className="flex flex-col items-center gap-2 group shrink-0" onClick={() => { showToast('正在跳转朋友圈...'); setIsShareDrawerOpen(false); }}>
-                  <div className="w-12 h-12 bg-[#07C160]/10 border border-[#07C160]/20 rounded-2xl flex items-center justify-center text-[#07C160] active:scale-95 transition-transform">
-                    <Users size={24} />
-                  </div>
-                  <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">朋友圈</span>
-                </button>
-                <button key="drawer1-copy-link" className="flex flex-col items-center gap-2 group shrink-0" onClick={() => { showToast('已复制链接'); setIsShareDrawerOpen(false); }}>
-                  <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/60 active:scale-95 transition-transform">
-                    <CornerUpRight size={20} />
-                  </div>
-                  <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">复制链接</span>
-                </button>
-                <button 
-                  key="drawer1-copy-topic"
-                  className="flex flex-col items-center gap-2 group shrink-0" 
-                  onClick={() => { 
-                    setIsShareDrawerOpen(false);
-                    setCircleInitialTopicInfo(topic);
-                    setScreen('create-circle');
-                    showToast('话题配置已复制，您可以修改后发布');
-                  }}
-                >
-                  <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/60 active:scale-95 transition-transform">
-                    <Copy size={20} />
-                  </div>
-                  <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">复制话题并创建</span>
-                </button>
+                {[
+                  { key: 'drawer1-heat-topic', icon: Flame, label: isSpotlighted ? '已加热' : '加热话题', active: isSpotlighted, action: () => { setIsShareDrawerOpen(false); setIsHeatingModalOpen(true); } },
+                  { key: 'drawer1-copy-topic', icon: Copy, label: '复制话题并创建', action: () => { setIsShareDrawerOpen(false); setCircleInitialTopicInfo(topic); setScreen('create-circle'); showToast('话题配置已复制，您可以修改后发布'); } },
+                  { key: 'drawer1-report', icon: AlertTriangle, label: '举报话题', action: () => { setReportType('video'); setReportTargetName(topic.title); setIsShareDrawerOpen(false); setScreen('report-user'); } },
+                ].map((item) => (
+                  <button key={item.key} className="flex flex-col items-center gap-2 group shrink-0" onClick={item.action}>
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center active:scale-95 transition-transform ${
+                      item.active
+                        ? 'bg-[#07C160]/10 border border-[#07C160]/20 text-[#07C160]'
+                        : 'bg-white/5 border border-white/10 text-white/60'
+                    }`}>
+                      <item.icon size={20} className={item.key === 'drawer1-heat-topic' && isSpotlighted ? 'fill-current' : ''} />
+                    </div>
+                    <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter text-center max-w-[58px] leading-tight">
+                      {item.label}
+                    </span>
+                  </button>
+                ))}
               </div>
           </motion.div>
         </motion.div>
@@ -1154,13 +1143,13 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
               </div>
             </div>
 
-            <HeatingConfirmationModal 
+            <HeatingConfirmationModal
               isOpen={isHeatingModalOpen}
               onClose={() => setIsHeatingModalOpen(false)}
               onConfirm={() => spotlightTopic(topic.id)}
             />
 
-            <GiftDonorDetailModal 
+            <GiftDonorDetailModal
               isOpen={isGiftDonorDetailModalOpen}
               onClose={() => setIsGiftDonorDetailModalOpen(false)}
               gifts={topicGifts}
@@ -1297,7 +1286,7 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                         <Camera size={24} className="text-white/5" />
                       </div>
                       <div className="absolute top-2 right-2 flex gap-1 z-20">
-                        <button 
+                        <button
                           onClick={(e) => {
                             e.stopPropagation();
                             setEditingClipId(clip.id);
@@ -1307,7 +1296,7 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                         >
                           <Lock size={12} />
                         </button>
-                        <button 
+                        <button
                           onClick={(e) => {
                             e.stopPropagation();
                             setClipToDelete(clip.id);
@@ -1396,14 +1385,14 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                       <h3 className="text-xl font-bold text-white tracking-wide">全部共创者</h3>
                       <p className="text-[10px] text-white/30 mt-1 uppercase tracking-widest">还差 {remainingCount} 个共创人成圈</p>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setIsCreatorsExpanded(false)}
                       className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-white/50"
                     >
                       <X size={20} />
                     </button>
                   </div>
-                  
+
                   <div className="flex-1 overflow-y-auto p-6 space-y-4">
                     {Array.from({ length: topic.joinedCount }).map((_, i) => (
                       <div
@@ -1414,10 +1403,10 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                         }}
                         className="flex items-center gap-4 bg-white/5 border border-white/5 p-4 rounded-3xl active:scale-[0.98] transition-transform cursor-pointer"
                       >
-                        <img 
-                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topic.id + i}`} 
-                          alt="" 
-                          className="w-12 h-12 rounded-full border-2 border-black bg-white/10" 
+                        <img
+                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topic.id + i}`}
+                          alt=""
+                          className="w-12 h-12 rounded-full border-2 border-black bg-white/10"
                         />
                         <div className="flex-1">
                           <h4 className="font-bold text-white">共创者 {i + 1}</h4>
@@ -1426,10 +1415,10 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                         <ChevronRight size={16} className="text-white/20" />
                       </div>
                     ))}
-                    
+
                     {Array.from({ length: remainingCount }).map((_, i) => (
-                      <div 
-                        key={`empty-${i}`} 
+                      <div
+                        key={`empty-${i}`}
                         className="flex items-center gap-4 bg-white/[0.02] border border-dashed border-white/10 p-4 rounded-3xl"
                       >
                         <div className="w-12 h-12 rounded-full border-2 border-dashed border-white/10 flex items-center justify-center">
@@ -1457,7 +1446,7 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                   </div>
                 </motion.div>
 
-                <FriendSelectionModal 
+                <FriendSelectionModal
                   isOpen={isInviteModalOpen}
                   onClose={() => setIsInviteModalOpen(false)}
                   remainingCount={remainingCount}
@@ -1468,7 +1457,7 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                 />
               </>
             )}
-            <VisibilitySelectorDrawer 
+            <VisibilitySelectorDrawer
               isOpen={isVisibilityDrawerOpenForClips}
               onClose={() => setIsVisibilityDrawerOpenForClips(false)}
               visibility={clipVisibility}
@@ -1508,9 +1497,9 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
             <CornerUpRight size={20} className="text-white" />
           </button>
         ) : (
-          <button 
-            onClick={(e) => { 
-                e.stopPropagation(); 
+          <button
+            onClick={(e) => {
+                e.stopPropagation();
                 setIsHeatingModalOpen(true);
             }}
             className={`h-10 px-4 rounded-2xl flex items-center gap-1.5 transition-all text-xs font-black uppercase border shadow-lg ${
@@ -1520,7 +1509,7 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
             <Flame size={14} className={isSpotlighted ? 'fill-current' : 'fill-none'} />
           </button>
         )}
-        <HeatingConfirmationModal 
+        <HeatingConfirmationModal
           isOpen={isHeatingModalOpen}
           onClose={() => setIsHeatingModalOpen(false)}
           onConfirm={() => spotlightTopic(topic.id)}
@@ -1529,12 +1518,12 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
 
       <main className="flex-1 overflow-y-auto no-scrollbar">
         <div className={`p-4 pb-4 bg-gradient-to-b ${
-          topic.tone === 'blue' ? 'from-indigo-500/20' : 
+          topic.tone === 'blue' ? 'from-indigo-500/20' :
           topic.tone === 'amber' ? 'from-amber-500/20' : 'from-emerald-500/20'
         } to-dark space-y-2 relative`}>
-          <div className="absolute inset-0 opacity-10 pointer-events-none" 
+          <div className="absolute inset-0 opacity-10 pointer-events-none"
                style={{ backgroundImage: 'radial-gradient(circle at 80% 20%, white 0%, transparent 100%)' }}></div>
-          
+
           <div className="flex items-center justify-between z-10 relative">
              <div className="flex flex-col gap-0.5">
                <div className="flex items-center gap-3">
@@ -1553,8 +1542,8 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
               <div className="relative group cursor-pointer overflow-hidden rounded-[40px] border border-white/5 bg-black shadow-2xl" onClick={() => showToast('即将开始播放完整共创作品...')}>
                 <div className="grid grid-cols-2 gap-0.5">
                   {Array.from({ length: Math.min(topic.targetCount, 4) }).map((_, i) => (
-                    <div 
-                      key={i} 
+                    <div
+                      key={i}
                       className="aspect-[3/4] bg-dark relative overflow-hidden group/item"
                     >
                       <img src={dailyLifeFrames[i]} alt="" className="absolute inset-0 h-full w-full object-cover" />
@@ -1562,7 +1551,7 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                       <div className="absolute top-3 left-3 px-2 py-1 bg-black/40 backdrop-blur-sm rounded-lg border border-white/5">
                         <p className="text-[9px] font-black text-white/50 tracking-tighter uppercase">Scene {i+1}</p>
                       </div>
-                      
+
                       <div className="absolute bottom-3 left-3 flex items-center gap-2">
                         <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=User${topic.id + i}`} alt="" className="w-5 h-5 rounded-full border border-white/20 shadow-sm" />
                         <span className="text-[9px] font-bold text-white/60 tracking-wider">@{i % 2 === 0 ? 'Soul' : 'Echo'}</span>
@@ -1577,14 +1566,14 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                     </div>
                   )}
                 </div>
-                
+
                 {/* Large Central Play Button */}
                 <div className="absolute inset-0 flex items-center justify-center z-10">
                   <div className="w-16 h-16 rounded-full bg-gold/90 backdrop-blur-md flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.4)] border border-white/20 transform group-active:scale-95 transition-all">
                     <Zap size={28} className="text-dark fill-dark ml-0.5" />
                   </div>
                 </div>
-                
+
                 <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
                    <p className="text-[9px] font-black text-gold tracking-widest uppercase">{topic.targetCount}位共创人集结</p>
                 </div>
@@ -1597,8 +1586,8 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                      <p className="text-[11px] font-black text-white tracking-[0.1em] uppercase">作品已就绪</p>
                    </div>
                  </div>
-                 <button 
-                  onClick={() => setScreen('gift')} 
+                 <button
+                  onClick={() => setScreen('gift')}
                   className="flex items-center gap-2 bg-white text-dark px-5 py-3 rounded-[20px] font-black text-[11px] uppercase shadow-xl active:scale-95 transition-all hover:bg-gold hover:text-dark"
                 >
                   <Gift size={14} />
@@ -1609,7 +1598,7 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
           )}
 
           {topic.status === 'completed' && (
-            <div 
+            <div
               onClick={() => {
                 setSelectedUserName(topic.creator);
                 setScreen('user-profile');
@@ -1808,8 +1797,8 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
                   ))}
               </div>
               <div className="mt-4 flex gap-2">
-                 <input 
-                   className="flex-1 h-11 bg-white/5 border border-white/10 rounded-[20px] px-5 text-xs font-bold focus:border-white/30 outline-none transition-all placeholder:text-white/10" 
+                 <input
+                   className="flex-1 h-11 bg-white/5 border border-white/10 rounded-[20px] px-5 text-xs font-bold focus:border-white/30 outline-none transition-all placeholder:text-white/10"
                    placeholder="留下你的共创注脚..."
                  />
               </div>
@@ -1825,7 +1814,7 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
           </p>
         )}
         <div className="flex gap-2">
-          <button 
+          <button
             onClick={() => toggleFavorite(topic.id)}
             className={`flex-1 h-14 rounded-[24px] font-black text-xs uppercase transition-all active:scale-95 shadow-xl flex items-center justify-center gap-2 ${
               isFavorite ? 'bg-gold text-dark shadow-gold/20' : 'bg-white/5 text-white/40 border border-white/5'
@@ -1834,10 +1823,10 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
             <Star size={16} className={isFavorite ? 'fill-current' : ''} />
             <span>{isFavorite ? '已收藏' : '收藏作品'}</span>
           </button>
-          
+
           {topic.status !== 'completed' ? (
             <>
-              <button 
+              <button
                 onClick={() => setScreen('join')}
                 className={`flex-[1.5] h-14 bg-red-primary text-white font-black rounded-[24px] shadow-[0_10px_25px_-5px_rgba(255,36,66,0.5)] active:scale-95 transition-all text-xs uppercase flex items-center justify-center gap-2`}
               >
@@ -1849,7 +1838,7 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
             </>
           ) : (
             <>
-              <button 
+              <button
                 onClick={() => setScreen('gift')}
                 className="flex-[1.5] h-14 bg-gold text-dark font-black rounded-[24px] shadow-[0_10px_25px_-5px_rgba(214,178,126,0.5)] active:scale-95 transition-all text-xs uppercase flex items-center justify-center gap-2"
               >
@@ -1862,7 +1851,7 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
           )}
         </div>
       </footer>
-      <VisibilitySelectorDrawer 
+      <VisibilitySelectorDrawer
         isOpen={isVisibilityDrawerOpenForClips}
         onClose={() => setIsVisibilityDrawerOpenForClips(false)}
         visibility={clipVisibility}
@@ -1877,13 +1866,13 @@ const TopicDetail = ({ topic, setScreen, prevScreen, toggleFavorite, isFavorite,
 
 // --- Me (Profile) Screen ---
 
-const NetworkListScreen = ({ 
-  setScreen, 
-  prevScreen, 
+const NetworkListScreen = ({
+  setScreen,
+  prevScreen,
   initialTab,
   userName = "Wesley"
-}: { 
-  setScreen: (s: Screen) => void, 
+}: {
+  setScreen: (s: Screen) => void,
   prevScreen: Screen,
   initialTab: 'friends' | 'followers' | 'following',
   userName?: string
@@ -1951,8 +1940,8 @@ const NetworkListScreen = ({
 
           <div className="space-y-3">
             {filteredUsers.map(user => (
-              <div 
-                key={user.id} 
+              <div
+                key={user.id}
                 className={`flex items-center gap-4 p-4 active:bg-[#faf4ec] transition-all group ${lightSurfaceCard}`}
                 onClick={() => setScreen('user-profile')}
               >
@@ -1961,7 +1950,7 @@ const NetworkListScreen = ({
                   <h4 className="font-bold text-[#2f261d] text-sm truncate">{user.name}</h4>
                   <p className="text-[10px] text-[#8f7f6d] mt-1 truncate tracking-wide">{user.bio}</p>
                 </div>
-                <button 
+                <button
                   onClick={(e) => { e.stopPropagation(); }}
                   className={`px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
                     user.isFollowing ? 'bg-[#f6ede3] text-[#8f7f6d] border border-[#eadfce]' : 'bg-[#FE2C55] text-white shadow-[0_10px_24px_rgba(254,44,85,0.18)]'
@@ -1986,7 +1975,7 @@ const NetworkListScreen = ({
   );
 };
 
-const MeScreen = ({ setScreen, profile, diamondBalance, energyBalance, likedCount, savedCount, worksCount, setInitialNetworkTab, setSelectedTopic, setCircleIsMyWorkMode, setCircleInitialTopicId }: { 
+const MeScreen = ({ setScreen, profile, diamondBalance, energyBalance, likedCount, savedCount, worksCount, setInitialNetworkTab, setSelectedTopic, setCircleIsMyWorkMode, setCircleInitialTopicId }: {
   setScreen: (s: Screen) => void,
   profile: EditableProfile,
   diamondBalance: number,
@@ -2003,7 +1992,6 @@ const MeScreen = ({ setScreen, profile, diamondBalance, energyBalance, likedCoun
   const [activeGallery, setActiveGallery] = useState<'works' | 'likes' | 'saved'>('works');
   const [isGrowthDialogOpen, setIsGrowthDialogOpen] = useState(false);
   const myStartedTopicIds = new Set(['1', '4', '6']);
-  const closestFormingTopic = TOPICS.find((topic) => topic.id === '1') || TOPICS.find((topic) => topic.status !== 'completed') || TOPICS[0];
 
   const getWorkBadge = (topic: Topic) => {
     if (topic.creator === CURRENT_USER.name || myStartedTopicIds.has(topic.id)) return '我发起的';
@@ -2012,15 +2000,6 @@ const MeScreen = ({ setScreen, profile, diamondBalance, energyBalance, likedCoun
   };
 
   const isPendingWork = (topic: Topic) => topic.status !== 'completed';
-  const openGrowthTopic = (event?: React.MouseEvent<HTMLButtonElement> | React.PointerEvent<HTMLButtonElement>) => {
-    event?.preventDefault();
-    event?.stopPropagation();
-    setSelectedTopic(closestFormingTopic);
-    setCircleIsMyWorkMode(false);
-    setCircleInitialTopicId(undefined);
-    setIsGrowthDialogOpen(false);
-    setScreen('topic-detail');
-  };
 
   const openWork = (topic: Topic) => {
     setSelectedTopic(topic);
@@ -2083,7 +2062,7 @@ const MeScreen = ({ setScreen, profile, diamondBalance, energyBalance, likedCoun
       </header>
 
       <main className="flex-1 overflow-y-auto no-scrollbar px-4 pb-32">
-        <section 
+        <section
           onClick={() => setScreen('personal-profile')}
           className={`${lightCard} mt-2 px-2 py-4 cursor-pointer group active:scale-[0.99] transition-all relative`}
         >
@@ -2319,27 +2298,21 @@ const MeScreen = ({ setScreen, profile, diamondBalance, energyBalance, likedCoun
               </div>
 
               <button
-                data-testid="growth-topic-card"
-                onClick={openGrowthTopic}
-                onPointerDownCapture={openGrowthTopic}
-                onPointerUp={openGrowthTopic}
+                onClick={() => setIsGrowthDialogOpen(false)}
                 className="mt-5 w-full rounded-[24px] bg-white px-4 py-4 text-left shadow-sm active:scale-[0.99] transition-transform"
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-[11px] font-black text-[#8f7f6d]">最接近成圈</p>
-                    <p className="mt-1 text-sm font-black text-[#2f261d]">{closestFormingTopic.title}</p>
+                    <p className="mt-1 text-sm font-black text-[#2f261d]">今天的城市声音</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xl font-black text-[#b4834a]">{closestFormingTopic.joinedCount}/{closestFormingTopic.targetCount}</p>
+                    <p className="text-xl font-black text-[#b4834a]">6/8</p>
                     <p className="text-[9px] font-black text-[#aa9a86]">人数</p>
                   </div>
                 </div>
                 <div className="mt-4 h-2 rounded-full bg-[#ebe2d4] overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-[#edbd79] to-[#ff2e67]"
-                    style={{ width: `${Math.min(100, (closestFormingTopic.joinedCount / closestFormingTopic.targetCount) * 100)}%` }}
-                  />
+                  <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-[#edbd79] to-[#ff2e67]" />
                 </div>
               </button>
 
@@ -2412,7 +2385,7 @@ const MessagesScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
       <main className="flex-1 overflow-y-auto no-scrollbar pb-32">
          <div className="bg-white">
             {conversations.map((convo) => (
-              <div 
+              <div
                 key={convo.name}
                 onClick={() => setScreen('dm')}
                 className="flex items-center px-4 py-3 active:bg-[#f7f7f7] transition-colors cursor-pointer relative"
@@ -2472,7 +2445,7 @@ const FriendsScreen = ({ setScreen, setSelectedUserName, initialTab = 'friends' 
   const renderUserList = (userList: typeof users) => (
     <div className="divide-y divide-white/[0.03]">
       {userList.map(user => (
-        <div 
+        <div
           key={user.id}
           onClick={() => {
               setSelectedUserName(user.name);
@@ -2485,7 +2458,7 @@ const FriendsScreen = ({ setScreen, setSelectedUserName, initialTab = 'friends' 
               <p className="text-[17px] font-bold text-white">{user.name}</p>
               <p className="text-xs text-white/30 truncate mt-0.5">{user.bio}</p>
           </div>
-          <button 
+          <button
               onClick={(e) => {
                 e.stopPropagation();
                 setSelectedUserName(user.name);
@@ -2531,19 +2504,19 @@ const FriendsScreen = ({ setScreen, setSelectedUserName, initialTab = 'friends' 
           <ArrowLeft size={20} />
         </button>
         <div className="flex gap-4">
-          <button 
+          <button
             onClick={() => setActiveTab('friends')}
             className={`font-bold transition-colors ${activeTab === 'friends' ? 'text-[#2f261d]' : 'text-[#b0a08e]'}`}
           >
             好友
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('following')}
             className={`font-bold transition-colors ${activeTab === 'following' ? 'text-[#2f261d]' : 'text-[#b0a08e]'}`}
           >
             关注
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('followers')}
             className={`font-bold transition-colors ${activeTab === 'followers' ? 'text-[#2f261d]' : 'text-[#b0a08e]'}`}
           >
@@ -2578,10 +2551,11 @@ const SettingsScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
           { icon: UserIcon, label: '账号资料', desc: '昵称、头像、简介', screen: 'account-profile' },
           { icon: ShieldCheck, label: '隐私政策', desc: '关注、作品、私信权限', screen: 'privacy-policy' },
           { icon: Bell, label: '通知设置', desc: '成圈、关注、评论提醒', screen: 'notification-settings' },
+          { icon: Lock, label: '黑名单列表', desc: '管理已拉黑的账号', screen: 'blacklist' },
           { icon: MessageSquare, label: '用户反馈', desc: '在使用中遇到问题或建议', screen: 'feedback' },
         ].map(item => (
-          <div 
-            key={item.label} 
+          <div
+            key={item.label}
             onClick={() => setScreen(item.screen as any)}
             className={`p-4 flex items-center gap-4 active:bg-[#faf4ec] transition-colors cursor-pointer ${lightSurfaceCard}`}
           >
@@ -2606,6 +2580,166 @@ const SettingsScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
   );
 };
 
+const BlacklistScreen = ({ setScreen, blockedUserNames, unblockUser }: {
+  setScreen: (s: Screen) => void,
+  blockedUserNames: string[],
+  unblockUser: (name: string) => void,
+}) => {
+  return (
+    <div className={lightPageRootPadded}>
+      <header className={lightHeaderShell}>
+        <button onClick={() => setScreen('settings')} className={lightIconButton}>
+          <ArrowLeft size={20} />
+        </button>
+        <h2 className="font-bold text-[#2f261d] text-lg tracking-tight">黑名单列表</h2>
+        <div className="w-10"></div>
+      </header>
+
+      <main className="flex-1 overflow-y-auto no-scrollbar px-6 py-4">
+        {blockedUserNames.length > 0 ? (
+          <div className="space-y-3">
+            {blockedUserNames.map((name) => (
+              <div key={name} className={`flex items-center gap-3 p-4 rounded-[24px] ${lightSurfaceCard}`}>
+                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`} alt="" className="h-12 w-12 rounded-2xl bg-[#f6ede3] object-cover" />
+                <div className="min-w-0 flex-1">
+                  <p className="font-black text-[#2f261d]">{name}</p>
+                  <p className="mt-0.5 text-[10px] font-black uppercase tracking-widest text-[#a79584]">已限制互动与私信</p>
+                </div>
+                <button
+                  onClick={() => unblockUser(name)}
+                  className="h-9 rounded-full border border-[#eadfce] bg-white px-4 text-[11px] font-black text-[#2f261d] active:scale-95 transition-transform"
+                >
+                  解除
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center text-center">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[24px] bg-white/72 text-[#c0b09d] shadow-sm">
+              <Lock size={26} />
+            </div>
+            <p className="font-black text-[#2f261d]">暂无黑名单账号</p>
+            <p className="mt-2 max-w-[220px] text-xs font-bold leading-relaxed text-[#8f7f6d]">
+              被拉黑的人会出现在这里，你可以随时解除限制。
+            </p>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
+const REPORT_REASONS = [
+  '发布不当的内容或信息',
+  '传播色情资源、引导私下交易',
+  '侵犯权益',
+  '未成年相关',
+  '冒充他人',
+  '涉嫌欺诈',
+  '危害人身安全',
+  '网络暴力',
+  '我不喜欢这个账号及内容',
+];
+
+const VIDEO_REPORT_REASONS = [
+  '我不喜欢',
+  '侵犯权益',
+  '色情低俗',
+  '违法犯罪',
+  '政治敏感',
+  '违规营销',
+  '不实信息',
+  '网络暴力',
+  '危害人身安全',
+  '未成年相关',
+];
+
+const ReportUserScreen = ({ setScreen, targetName, reportType, showToast }: {
+  setScreen: (s: Screen) => void,
+  targetName: string,
+  reportType: 'account' | 'video',
+  showToast: (m: string) => void,
+}) => {
+  const [reason, setReason] = useState('');
+  const isVideoReport = reportType === 'video';
+  const reasons = isVideoReport ? VIDEO_REPORT_REASONS : REPORT_REASONS;
+
+  return (
+    <div className="flex h-full flex-col bg-[#f3f6fc] pt-8 text-[#161616]">
+      <header className="flex items-center justify-between px-5 py-4">
+        <button onClick={() => setScreen(isVideoReport ? 'home' : 'user-profile')} className="flex h-10 w-10 items-center justify-center rounded-2xl text-[#161616] active:scale-95 transition-transform">
+          <ArrowLeft size={24} strokeWidth={2.5} />
+        </button>
+        <h2 className="text-lg font-black">{isVideoReport ? '话题举报' : '账号举报'}</h2>
+        <div className="w-10"></div>
+      </header>
+
+      <main className="flex-1 overflow-y-auto no-scrollbar px-4 pb-4">
+        <div className="mb-4 px-2 text-xs font-bold text-[#7d8795]">举报对象：{targetName}</div>
+        <div className="overflow-hidden rounded-[20px] bg-white shadow-sm">
+          {reasons.map((item, index) => (
+            <button
+              key={item}
+              onClick={() => setReason(item)}
+              className={`flex w-full items-center justify-between px-5 py-5 text-left active:bg-[#f7f8fb] transition-colors ${
+                index === reasons.length - 1 ? '' : 'border-b border-[#edf0f5]'
+              }`}
+            >
+              <span className="pr-4 text-[17px] font-medium leading-snug text-[#222]">{item}</span>
+              <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                reason === item ? 'border-[#6f91f5] bg-[#6f91f5]' : 'border-[#b8bdc5]'
+              }`}>
+                {reason === item && <Check size={12} className="text-white" strokeWidth={4} />}
+              </span>
+            </button>
+          ))}
+        </div>
+      </main>
+
+      <div className="px-4 pb-8 pt-3">
+        <button
+          disabled={!reason}
+          onClick={() => {
+            showToast('举报已提交');
+            setScreen('report-success');
+          }}
+          className="h-14 w-full rounded-2xl bg-[#2f261d] text-lg font-black text-white shadow-[0_14px_28px_rgba(47,38,29,0.16)] transition-transform active:scale-95 disabled:bg-[#d8cbbb] disabled:text-white/80 disabled:shadow-none"
+        >
+          下一步
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const ReportSuccessScreen = ({ setScreen, targetName }: {
+  setScreen: (s: Screen) => void,
+  targetName: string,
+}) => {
+  return (
+    <div className={lightPageRootPadded}>
+      <main className="flex flex-1 flex-col items-center justify-center px-8 text-center">
+        <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#eaf7ef] text-emerald-500 shadow-sm">
+          <Check size={36} strokeWidth={3.5} />
+        </div>
+        <h1 className="text-2xl font-black text-[#2f261d]">举报已提交</h1>
+        <p className="mt-3 text-sm font-bold leading-relaxed text-[#8f7f6d]">
+          我们会尽快核查 {targetName} 的相关内容，并在必要时采取处理措施。
+        </p>
+      </main>
+      <div className="px-6 pb-10">
+        <button
+          onClick={() => setScreen('home')}
+          className="h-14 w-full rounded-2xl bg-[#2f261d] text-sm font-black text-white shadow-[0_14px_28px_rgba(47,38,29,0.14)] active:scale-95 transition-transform"
+        >
+          完成
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const AccountProfileScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
   return (
     <div className={lightPageRootPadded}>
@@ -2626,7 +2760,7 @@ const AccountProfileScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
             </button>
           </div>
         </div>
-        
+
         <div className="space-y-4">
           <div className="space-y-1">
             <label className="text-[10px] font-black text-[#b0a08e] uppercase tracking-widest pl-4">昵称</label>
@@ -2635,7 +2769,7 @@ const AccountProfileScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
               <ChevronRight size={16} className="text-[#c0b09d]" />
             </div>
           </div>
-          
+
           <div className="space-y-1">
             <label className="text-[10px] font-black text-[#b0a08e] uppercase tracking-widest pl-4">简介</label>
             <div className={`w-full px-4 py-4 rounded-3xl text-[#2f261d] font-bold flex justify-between items-center ${lightSurfaceCard}`}>
@@ -2643,7 +2777,7 @@ const AccountProfileScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
               <ChevronRight size={16} className="text-[#c0b09d]" />
             </div>
           </div>
-          
+
           <div className="space-y-1">
             <label className="text-[10px] font-black text-[#b0a08e] uppercase tracking-widest pl-4">性别</label>
             <div className={`w-full px-4 py-4 rounded-3xl text-[#2f261d] font-bold flex justify-between items-center ${lightSurfaceCard}`}>
@@ -2671,16 +2805,16 @@ const PrivacyPolicyScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) 
       <main className="flex-1 overflow-y-auto no-scrollbar px-6 py-6 space-y-6 text-[#6f6256] text-sm leading-relaxed">
         <h3 className="text-xl font-bold text-[#2f261d]">Dream Record 隐私保护指引</h3>
         <p>本指引旨在帮助你了解我们如何收集、使用、存储及分享你的个人信息，以及你如何管理这些信息。</p>
-        
+
         <h4 className="font-bold text-[#2f261d] text-base">1. 我们收集的信息</h4>
         <p>当你使用本应用时，为了提供基本服务，我们可能会收集你的设备信息、网络信息、使用日志等数据。</p>
-        
+
         <h4 className="font-bold text-[#2f261d] text-base">2. 信息的存储</h4>
         <p>我们承诺将你的信息存储在安全可靠的环境中，采用加密等技术措施保护数据安全。</p>
-        
+
         <h4 className="font-bold text-[#2f261d] text-base">3. 信息的使用</h4>
         <p>收集的信息将专门用于持续优化产品体验、为你推荐个性化内容等，绝不出售给任何第三方。</p>
-        
+
         <h4 className="font-bold text-[#2f261d] text-base">4. 你的权利</h4>
         <p>你有权随时查询、更正或要求删除你的个人信息，也可以在账号设置中管理各类隐私权限选项。</p>
       </main>
@@ -2710,7 +2844,7 @@ const NotificationSettingsScreen = ({ setScreen }: { setScreen: (s: Screen) => v
               <div className="w-4 h-4 rounded-full bg-white translate-x-6" />
             </div>
           </div>
-          
+
           <div className={`flex items-center justify-between p-5 rounded-3xl ${lightSurfaceCard}`}>
             <div>
               <p className="text-base font-bold text-[#2f261d] mb-0.5">互动通知</p>
@@ -2720,7 +2854,7 @@ const NotificationSettingsScreen = ({ setScreen }: { setScreen: (s: Screen) => v
               <div className="w-4 h-4 rounded-full bg-white shadow-sm" />
             </div>
           </div>
-          
+
           <div className={`flex items-center justify-between p-5 rounded-3xl ${lightSurfaceCard}`}>
             <div>
               <p className="text-base font-bold text-[#2f261d] mb-0.5">系统公告</p>
@@ -2738,8 +2872,8 @@ const NotificationSettingsScreen = ({ setScreen }: { setScreen: (s: Screen) => v
 
 // --- Saved Topics Screen ---
 
-const TopicCollectionScreen = ({ setScreen, topicsList, setSelectedTopic, topicIds, title, emptyText, emptyIcon }: { 
-  setScreen: (s: Screen) => void, 
+const TopicCollectionScreen = ({ setScreen, topicsList, setSelectedTopic, topicIds, title, emptyText, emptyIcon }: {
+  setScreen: (s: Screen) => void,
   topicsList: Topic[],
   setSelectedTopic: (t: Topic) => void,
   topicIds: Set<string>,
@@ -2770,7 +2904,7 @@ const TopicCollectionScreen = ({ setScreen, topicsList, setSelectedTopic, topicI
         ) : (
           <div className="columns-2 gap-4 space-y-4">
              {topics.map((topic, i) => (
-                <motion.div 
+                <motion.div
                   key={`${topic.id}-${i}`}
                   whileHover={{ scale: 1.02 }}
                   onClick={() => {
@@ -2780,7 +2914,7 @@ const TopicCollectionScreen = ({ setScreen, topicsList, setSelectedTopic, topicI
                   className={`break-inside-avoid p-4 space-y-3 shadow-lg cursor-pointer ${lightSurfaceCard}`}
                 >
                    <div className={`aspect-[3/4] rounded-2xl bg-gradient-to-br relative overflow-hidden ${
-                     topic.tone === 'amber' ? 'from-[#fff2df] to-[#f6ede3]' : 
+                     topic.tone === 'amber' ? 'from-[#fff2df] to-[#f6ede3]' :
                      topic.tone === 'green' ? 'from-[#eef8f1] to-[#f6ede3]' : 'from-[#eef3fb] to-[#f6ede3]'
                    }`}>
                       <div className="absolute inset-0 flex items-center justify-center opacity-15">
@@ -2804,7 +2938,7 @@ const TopicCollectionScreen = ({ setScreen, topicsList, setSelectedTopic, topicI
                        </p>
                      )}
                      <div className="flex items-center justify-between pt-1">
-                         <div 
+                         <div
                            className="flex items-center gap-1 cursor-pointer"
                            onClick={(e) => {
                              e.stopPropagation();
@@ -2839,8 +2973,8 @@ const TopicCollectionScreen = ({ setScreen, topicsList, setSelectedTopic, topicI
   );
 };
 
-const LikedTopicsScreen = ({ setScreen, topics, likedTopicIds, setSelectedTopic }: { 
-  setScreen: (s: Screen) => void, 
+const LikedTopicsScreen = ({ setScreen, topics, likedTopicIds, setSelectedTopic }: {
+  setScreen: (s: Screen) => void,
   topics: Topic[],
   likedTopicIds: Set<string>,
   setSelectedTopic: (t: Topic) => void
@@ -2856,8 +2990,8 @@ const LikedTopicsScreen = ({ setScreen, topics, likedTopicIds, setSelectedTopic 
   />
 );
 
-const SavedTopicsScreen = ({ setScreen, topics, savedTopicIds, setSelectedTopic }: { 
-  setScreen: (s: Screen) => void, 
+const SavedTopicsScreen = ({ setScreen, topics, savedTopicIds, setSelectedTopic }: {
+  setScreen: (s: Screen) => void,
   topics: Topic[],
   savedTopicIds: Set<string>,
   setSelectedTopic: (t: Topic) => void
@@ -2955,7 +3089,7 @@ const MyWorksScreen = ({ setScreen, topics, setSelectedTopic, userVlogs, setCirc
                 const topic = topics.find(t => t.id === (work as any).topicId) || topics[i % topics.length];
                 const visibility = getVisibility(work.id);
                 const isPending = work.status !== '已成圈';
-                
+
                 return (
                   <motion.div
                     key={work.id}
@@ -2984,7 +3118,7 @@ const MyWorksScreen = ({ setScreen, topics, setSelectedTopic, userVlogs, setCirc
                   <div className={`absolute inset-0 bg-gradient-to-t ${isPending ? 'from-black/75 via-black/30 to-black/5' : 'from-black/65 via-black/15 to-transparent'}`} />
 
                   <div className="absolute top-2 right-2 z-10 flex gap-1">
-                     <button 
+                     <button
                        onClick={(e) => {
                          e.stopPropagation();
                          setEditingWorkId(work.id);
@@ -3024,7 +3158,7 @@ const MyWorksScreen = ({ setScreen, topics, setSelectedTopic, userVlogs, setCirc
         </section>
       </main>
 
-      <VisibilitySelectorDrawer 
+      <VisibilitySelectorDrawer
         isOpen={isVisibilityDrawerOpen}
         onClose={() => setIsVisibilityDrawerOpen(false)}
         visibility={editingWorkId ? getVisibility(editingWorkId) : 'public'}
@@ -3079,9 +3213,9 @@ const CreateCircleScreen = ({ setScreen, setSelectedTopic, initialTopicInfo }: {
 
       <main className="flex-1 p-6 space-y-8 overflow-y-auto no-scrollbar pb-10">
         <div className="space-y-4">
-          <input 
-            className={`w-full h-14 rounded-2xl px-5 font-bold outline-none focus:border-[#FE2C55]/25 ${lightInputField}`} 
-            placeholder="你需要大家做什么" 
+          <input
+            className={`w-full h-14 rounded-2xl px-5 font-bold outline-none focus:border-[#FE2C55]/25 ${lightInputField}`}
+            placeholder="你需要大家做什么"
             value={topicTitle}
             onChange={(e) => setTopicTitle(e.target.value)}
           />
@@ -3097,8 +3231,8 @@ const CreateCircleScreen = ({ setScreen, setSelectedTopic, initialTopicInfo }: {
           <label className="text-[10px] font-black uppercase text-[#b19f8d] tracking-widest ml-1">参与人数（2-12）</label>
           <div className="grid grid-cols-4 gap-2">
             {[2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(num => (
-              <button 
-                key={num} 
+              <button
+                key={num}
                 onClick={() => setParticipants(num)}
                 className={`h-12 rounded-2xl font-black text-xs transition-all ${participants === num ? 'bg-[#FE2C55] text-white shadow-[0_12px_24px_rgba(254,44,85,0.18)]' : 'bg-white/82 text-[#8f7f6d] border border-[#eadfce]'}`}
               >
@@ -3112,17 +3246,17 @@ const CreateCircleScreen = ({ setScreen, setSelectedTopic, initialTopicInfo }: {
           <label className="text-[10px] font-black uppercase text-[#b19f8d] tracking-widest ml-1">作品时间限制 (3-10秒)</label>
           <div className="flex items-center gap-4 p-4 rounded-2xl border border-[#eadfce] bg-white/82 shadow-sm">
              <span className="text-sm font-bold text-[#2f261d] w-8">{duration}s</span>
-             <input 
-               type="range" 
-               min="3" 
-               max="10" 
-               value={duration} 
+             <input
+               type="range"
+               min="3"
+               max="10"
+               value={duration}
                onChange={(e) => setDuration(parseInt(e.target.value))}
                className="flex-1 h-1 rounded-full appearance-none cursor-pointer accent-[#FE2C55] bg-[#eadfce]"
              />
              <div className="flex gap-1">
                 {[3, 5, 8, 10].map(v => (
-                  <button 
+                  <button
                     key={v}
                     onClick={() => setDuration(v)}
                     className={`px-2 py-1 rounded-lg text-[8px] font-black tracking-tighter ${duration === v ? 'bg-[#FE2C55] text-white' : 'bg-[#f6ede3] text-[#8f7f6d]'}`}
@@ -3136,7 +3270,7 @@ const CreateCircleScreen = ({ setScreen, setSelectedTopic, initialTopicInfo }: {
 
         <div className="space-y-4">
           <label className="text-[10px] font-black uppercase text-[#b19f8d] tracking-widest ml-1">可见范围</label>
-          <div 
+          <div
             onClick={() => setShowSelector(true)}
             className={`p-6 flex items-center justify-between active:bg-[#fbf6ef] transition-all group ${lightSurfaceCard}`}
           >
@@ -3172,7 +3306,7 @@ const CreateCircleScreen = ({ setScreen, setSelectedTopic, initialTopicInfo }: {
         <p className="text-[10px] text-[#8f7f6d] text-center font-medium mb-4">
             创建话题后，该话题产生的收益，将由所有同圈的创作者平分。
         </p>
-        <button 
+        <button
           onClick={() => {
             // Mock a "created" topic
             const newTopic: Topic = {
@@ -3192,14 +3326,14 @@ const CreateCircleScreen = ({ setScreen, setSelectedTopic, initialTopicInfo }: {
             };
             setSelectedTopic(newTopic);
             setScreen('topic-detail');
-          }} 
+          }}
           className="w-full h-14 bg-[#FE2C55] text-white rounded-full font-black uppercase text-xs shadow-[0_18px_40px_rgba(254,44,85,0.22)] active:scale-95 transition-transform flex items-center justify-center"
         >
           发起召集
         </button>
       </footer>
 
-      <VisibilitySelectorDrawer 
+      <VisibilitySelectorDrawer
         isOpen={showSelector}
         onClose={() => setShowSelector(false)}
         visibility={visibility}
@@ -3235,7 +3369,7 @@ const CreateSuccessScreen = ({ setScreen, showToast }: { setScreen: (s: Screen) 
       </div>
 
       <AnimatePresence>
-        <FriendSelectionModal 
+        <FriendSelectionModal
           isOpen={isInviteModalOpen}
           onClose={() => setIsInviteModalOpen(false)}
           remainingCount={10}
@@ -3267,8 +3401,8 @@ const CreateAndShootScreen = ({ setScreen, showToast }: { setScreen: (s: Screen)
 
        {/* Overlays */}
        <div className="absolute inset-x-0 top-0 p-6 pt-12 flex items-center justify-between z-30">
-          <button 
-            onClick={() => setScreen('topic-detail')} 
+          <button
+            onClick={() => setScreen('topic-detail')}
             className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center"
           >
             <ArrowLeft size={20} />
@@ -3289,7 +3423,7 @@ const CreateAndShootScreen = ({ setScreen, showToast }: { setScreen: (s: Screen)
              <button onClick={() => showToast('美颜模式已开启')} className="w-12 h-12 glass-pill rounded-full flex items-center justify-center text-white active:scale-95 transition-transform backdrop-blur-md">
                 <Sparkles size={22} />
              </button>
-             <button 
+             <button
                onClick={() => setScreen('video-edit')}
                className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center active:scale-95 transition-transform shadow-[0_0_40px_rgba(255,255,255,0.3)]"
              >
@@ -3325,8 +3459,8 @@ const JoinScreen = ({ topic, setScreen, showToast }: { topic: Topic, setScreen: 
 
        {/* Overlays */}
        <div className="absolute inset-x-0 top-0 p-6 pt-12 flex items-center justify-between z-30">
-          <button 
-            onClick={() => setScreen('topic-detail')} 
+          <button
+            onClick={() => setScreen('topic-detail')}
             className="w-10 h-10 glass-pill rounded-2xl flex items-center justify-center border border-white/5"
           >
             <ArrowLeft size={20} />
@@ -3349,12 +3483,12 @@ const JoinScreen = ({ topic, setScreen, showToast }: { topic: Topic, setScreen: 
                  <p className="text-xs font-bold text-white/90">正在执行: {topic.prompt}</p>
               </div>
             </div>
-            
+
             <div className="flex items-center justify-between px-4">
                <button onClick={() => showToast('美颜模式已开启')} className="w-12 h-12 glass-pill rounded-full flex items-center justify-center text-white">
                   <Sparkles size={22} />
                </button>
-               <button 
+               <button
                  onClick={() => setScreen('video-edit')}
                  className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center active:scale-95 transition-transform shadow-[0_0_40px_rgba(255,255,255,0.3)]"
                >
@@ -3380,14 +3514,14 @@ const JoinSuccessScreen = ({ setScreen, showToast }: { setScreen: (s: Screen) =>
     <div className="flex flex-col h-full bg-dark p-10 pt-16">
       <div className="flex-1 flex flex-col items-center justify-center space-y-10">
         <div className="relative">
-           <motion.div 
+           <motion.div
              initial={{ scale: 0 }}
              animate={{ scale: 1 }}
              className="w-32 h-32 bg-white rounded-[40px] flex items-center justify-center shadow-[0_0_80px_rgba(255,255,255,0.2)]"
            >
              <ShieldCheck size={64} className="text-white" strokeWidth={2.5} />
            </motion.div>
-           <motion.div 
+           <motion.div
              initial={{ opacity: 0, y: 20 }}
              animate={{ opacity: 1, y: 0 }}
              transition={{ delay: 0.3 }}
@@ -3404,7 +3538,7 @@ const JoinSuccessScreen = ({ setScreen, showToast }: { setScreen: (s: Screen) =>
           </p>
         </div>
 
-        <div 
+        <div
           onClick={() => setIsVisibilityDrawerOpen(true)}
           className="w-full max-w-[280px] p-5 rounded-3xl bg-white/5 border border-white/5 flex items-center justify-between active:bg-white/10 transition-all cursor-pointer group"
         >
@@ -3439,7 +3573,7 @@ const JoinSuccessScreen = ({ setScreen, showToast }: { setScreen: (s: Screen) =>
       </div>
 
       <AnimatePresence>
-        <FriendSelectionModal 
+        <FriendSelectionModal
           isOpen={isInviteModalOpen}
           onClose={() => setIsInviteModalOpen(false)}
           remainingCount={10}
@@ -3450,7 +3584,7 @@ const JoinSuccessScreen = ({ setScreen, showToast }: { setScreen: (s: Screen) =>
         />
       </AnimatePresence>
 
-      <VisibilitySelectorDrawer 
+      <VisibilitySelectorDrawer
         isOpen={isVisibilityDrawerOpen}
         onClose={() => setIsVisibilityDrawerOpen(false)}
         visibility={visibility}
@@ -3464,19 +3598,19 @@ const JoinSuccessScreen = ({ setScreen, showToast }: { setScreen: (s: Screen) =>
 
 // --- Circle (Discover) Screen ---
 
-const CircleScreen = ({ 
-  setScreen, 
+const CircleScreen = ({
+  setScreen,
   prevScreen,
-  topics, 
-  setSelectedTopic, 
-  setSelectedUserName, 
-  savedTopicIds, 
-  toggleFavorite, 
-  likedTopicIds, 
-  toggleLike, 
-  spotlightTopicIds, 
-  spotlightTopic, 
-  showToast, 
+  topics,
+  setSelectedTopic,
+  setSelectedUserName,
+  savedTopicIds,
+  toggleFavorite,
+  likedTopicIds,
+  toggleLike,
+  spotlightTopicIds,
+  spotlightTopic,
+  showToast,
   diamondBalance,
   setDiamondBalance,
   initialTopicId,
@@ -3485,9 +3619,12 @@ const CircleScreen = ({
   setCircleInitialTopicId,
   setCircleInitialTopicInfo,
   isGiftDonorDetailModalOpen,
-  setIsGiftDonorDetailModalOpen
-}: { 
-  setScreen: (s: Screen) => void, 
+  setIsGiftDonorDetailModalOpen,
+  setCirclePureMode,
+  setReportTargetName,
+  setReportType
+}: {
+  setScreen: (s: Screen) => void,
   prevScreen: Screen,
   topics: Topic[],
   setSelectedTopic: (t: Topic) => void,
@@ -3507,7 +3644,10 @@ const CircleScreen = ({
   setCircleInitialTopicId: (id: string | undefined) => void,
   setCircleInitialTopicInfo: (info: Partial<Topic> | undefined) => void,
   isGiftDonorDetailModalOpen: boolean,
-  setIsGiftDonorDetailModalOpen: (val: boolean) => void
+  setIsGiftDonorDetailModalOpen: (val: boolean) => void,
+  setCirclePureMode: (val: boolean) => void,
+  setReportTargetName: (name: string) => void,
+  setReportType: (type: 'account' | 'video') => void
 }) => {
   const [activeTab, setActiveTab] = useState('推荐');
   const [isShareDrawerOpen, setIsShareDrawerOpen] = useState(false);
@@ -3515,7 +3655,7 @@ const CircleScreen = ({
   const [isVisibilityDrawerOpen, setIsVisibilityDrawerOpen] = useState(false);
   const [visibility, setVisibility] = useState<Visibility>('public');
   const [selectedFriendIds, setSelectedFriendIds] = useState<Set<string>>(new Set());
-  
+
   const [sharingTopic, setSharingTopic] = useState<Topic | null>(null);
   const [isGiftDrawerOpen, setIsGiftDrawerOpen] = useState(false);
   const [selectedGiftName, setSelectedGiftName] = useState(GIFTS[0]?.name || '');
@@ -3532,6 +3672,11 @@ const CircleScreen = ({
   const [showClearScreenHint, setShowClearScreenHint] = useState(true);
   const gestureStartRef = useRef<{ x: number; y: number } | null>(null);
   const ignoreNextClickRef = useRef(false);
+
+  useEffect(() => {
+    setCirclePureMode(isPureMode);
+    return () => setCirclePureMode(false);
+  }, [isPureMode, setCirclePureMode]);
 
   const toggleShareUser = (id: string) => {
     const next = new Set(selectedShareUserIds);
@@ -3603,12 +3748,20 @@ const CircleScreen = ({
     setIsGiftDrawerOpen(false);
   };
 
+  const completedCircleTopics = topics.filter(t => t.status === 'completed');
+  const targetCircleTopic = initialTopicId ? completedCircleTopics.find(t => t.id === initialTopicId) : undefined;
+  const circleFeedTopics = isMyWorkMode
+    ? completedCircleTopics.filter(t => t.id === initialTopicId)
+    : targetCircleTopic
+      ? [targetCircleTopic, ...completedCircleTopics.filter(t => t.id !== initialTopicId), ...completedCircleTopics]
+      : [...completedCircleTopics, ...completedCircleTopics];
+
   return (
     <div className="flex flex-col h-full bg-black font-sans relative overflow-hidden">
       {/* Header Overlay */}
       <AnimatePresence>
         {!isPureMode && (
-          <motion.header 
+          <motion.header
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -3616,11 +3769,11 @@ const CircleScreen = ({
           >
             {isMyWorkMode ? (
               <button
-                onClick={(e) => { 
-                  e.stopPropagation(); 
+                onClick={(e) => {
+                  e.stopPropagation();
                   setCircleIsMyWorkMode(false);
                   setCircleInitialTopicId(undefined);
-                  setScreen(prevScreen || 'me'); 
+                  setScreen(prevScreen || 'me');
                 }}
                 className="w-10 h-10 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white pointer-events-auto active:scale-90 transition-transform"
               >
@@ -3635,17 +3788,11 @@ const CircleScreen = ({
           </motion.header>
         )}
       </AnimatePresence>
-      <GiftDonorDetailModal 
+      <GiftDonorDetailModal
               isOpen={isGiftDonorDetailModalOpen}
               onClose={() => setIsGiftDonorDetailModalOpen(false)}
               gifts={MOCK_GIFT_RECORDS}
             />
-
-      {!isPureMode && showClearScreenHint && (
-        <div className="pointer-events-none absolute right-2 bottom-[92px] z-50 max-w-[132px] rounded-full bg-black/35 px-3 py-1.5 text-center text-[10px] font-black text-white/80 shadow-lg backdrop-blur-md border border-white/10">
-          右滑或点清屏
-        </div>
-      )}
 
       {isPureMode && (
         <button
@@ -3653,7 +3800,7 @@ const CircleScreen = ({
             e.stopPropagation();
             setIsPureMode(false);
           }}
-          className="absolute right-4 bottom-[116px] z-50 flex h-9 w-9 items-center justify-center rounded-full text-white shadow-lg drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] active:scale-95 transition-transform"
+          className="absolute right-4 bottom-6 z-50 flex h-9 w-9 items-center justify-center rounded-full bg-black/24 text-white shadow-lg backdrop-blur-sm drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] active:scale-95 transition-transform"
           aria-label="退出清屏模式"
         >
           <FileOutput size={28} strokeWidth={2.5} />
@@ -3661,19 +3808,18 @@ const CircleScreen = ({
       )}
 
       {/* Full Screen Scroll Container */}
-      <main className="h-full overflow-y-scroll snap-y snap-mandatory no-scrollbar pb-24">
-        {(isMyWorkMode ? topics : [...topics, ...topics])
-          .filter(t => t.status === 'completed')
-          .filter(t => isMyWorkMode ? t.id === initialTopicId : true)
-          .map((topic, i) => {
+      <main className={`h-full overflow-y-scroll snap-y snap-mandatory no-scrollbar ${isPureMode ? 'pb-0' : 'pb-24'}`}>
+        {circleFeedTopics.map((topic, i) => {
           const isFavorite = savedTopicIds.has(topic.id);
           const isLiked = likedTopicIds.has(topic.id);
           const isSpotlighted = spotlightTopicIds.has(topic.id) || topic.status === 'completed';
-          
+
           return (
-            <section 
-              key={`${topic.id}-${i}`} 
-              className="h-full w-full snap-start relative flex flex-col justify-end pb-12 overflow-hidden"
+            <section
+              key={`${topic.id}-${i}`}
+              className={`h-full w-full snap-start relative flex flex-col overflow-hidden ${
+                isPureMode ? 'items-center justify-center pb-0' : 'justify-end pb-12'
+              }`}
               onPointerDown={startPointerGesture}
               onPointerUp={endPointerGesture}
               onPointerLeave={cancelPointerGesture}
@@ -3689,7 +3835,7 @@ const CircleScreen = ({
               {/* Play/Pause Indicator Animation */}
               <AnimatePresence>
                 {isPaused && (
-                   <motion.div 
+                   <motion.div
                      initial={{ opacity: 0, scale: 0.5 }}
                      animate={{ opacity: 1, scale: 1 }}
                      exit={{ opacity: 0, scale: 1.5 }}
@@ -3751,17 +3897,21 @@ const CircleScreen = ({
                 <div className={`absolute inset-0 bg-black/20 transition-opacity ${isPaused ? 'opacity-100' : 'opacity-0'}`}></div>
               </div>
 
+              {!isPureMode && (
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-44 bg-gradient-to-t from-black/85 via-black/48 to-transparent" />
+              )}
+
               {/* Interaction Bar (Fixed Right) */}
               <AnimatePresence>
                 {!isPureMode && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                     className="absolute right-2 bottom-16 z-20 flex flex-col items-center gap-4"
                   >
                     <div className="relative mb-2">
-                      <div 
+                      <div
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedUserName(topic.creator);
@@ -3771,7 +3921,7 @@ const CircleScreen = ({
                       >
                         <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topic.creator}`} alt="" className="w-full h-full rounded-full object-cover" />
                       </div>
-                      <button 
+                      <button
                         onClick={(e) => { e.stopPropagation(); setScreen('join'); }}
                         className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-6 h-6 bg-red-primary rounded-full flex items-center justify-center text-white border-2 border-dark"
                       >
@@ -3780,7 +3930,7 @@ const CircleScreen = ({
                     </div>
 
                     <div className="flex flex-col items-center gap-1">
-                      <button 
+                      <button
                         onClick={(e) => { e.stopPropagation(); toggleLike(topic.id); }}
                         className={`w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] ${
                           isLiked ? 'text-red-500' : 'text-white'
@@ -3792,7 +3942,7 @@ const CircleScreen = ({
                     </div>
 
                     <div className="flex flex-col items-center gap-1">
-                      <button 
+                      <button
                         onClick={(e) => { e.stopPropagation(); setShowComments(true); }}
                         className="w-9 h-9 rounded-full flex items-center justify-center text-white active:scale-95 transition-transform drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
                       >
@@ -3802,7 +3952,7 @@ const CircleScreen = ({
                     </div>
 
                     <div className="flex flex-col items-center gap-1">
-                      <button 
+                      <button
                         onClick={(e) => { e.stopPropagation(); toggleFavorite(topic.id); }}
                         className={`w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] ${
                           isFavorite ? 'text-gold' : 'text-white'
@@ -3814,13 +3964,13 @@ const CircleScreen = ({
                         {topic.bookmarks && topic.bookmarks !== '0' ? topic.bookmarks : '收藏'}
                       </span>
                     </div>
- 
+
                     <div className="flex flex-col items-center gap-1">
-                      <button 
-                        onClick={(e) => { 
-                          e.stopPropagation(); 
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSharingTopic(topic);
                           if (isMyWorkMode) {
-                            setSharingTopic(topic);
                             setIsMoreDrawerOpen(true);
                           } else {
                             handleShare(topic);
@@ -3835,14 +3985,26 @@ const CircleScreen = ({
                       </span>
                     </div>
 
-                    <div className="flex flex-col items-center gap-1">
+                    <div className="relative flex flex-col items-center gap-1">
+                      {showClearScreenHint && (
+                        <div className="pointer-events-none absolute right-[42px] top-[18px] z-10 flex -translate-y-1/2 items-center">
+                          <div className="whitespace-nowrap rounded-full border border-white/14 bg-black/52 px-3 py-1.5 text-[10px] font-black leading-none text-white/88 shadow-[0_8px_24px_rgba(0,0,0,0.34)] backdrop-blur-md">
+                            右滑或点这里，清爽看全屏
+                          </div>
+                          <div className="h-px w-3 bg-white/36" />
+                          <div className="h-1.5 w-1.5 rounded-full bg-white/70 shadow-[0_0_10px_rgba(255,255,255,0.5)]" />
+                        </div>
+                      )}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowClearScreenHint(false);
                           setIsPureMode(true);
                         }}
-                        className="w-9 h-9 rounded-full flex items-center justify-center text-white active:scale-95 transition-transform drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]"
+                        className={`w-9 h-9 rounded-full flex items-center justify-center text-white active:scale-95 transition-all drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] ${
+                          showClearScreenHint ? 'bg-white/10 ring-1 ring-white/35 shadow-[0_0_18px_rgba(255,255,255,0.18)]' : ''
+                        }`}
+                        aria-label="进入清屏模式"
                       >
                         <FileX size={28} strokeWidth={2.5} />
                       </button>
@@ -3852,7 +4014,7 @@ const CircleScreen = ({
                 )}
               </AnimatePresence>
 
-              <HeatingConfirmationModal 
+              <HeatingConfirmationModal
                 isOpen={isHeatingModalOpen}
                 onClose={() => setIsHeatingModalOpen(false)}
                 onConfirm={() => sharingTopic && spotlightTopic(sharingTopic.id)}
@@ -3861,33 +4023,33 @@ const CircleScreen = ({
               {/* Infobar (Bottom Left) */}
               <AnimatePresence>
                 {!isPureMode && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 20 }}
-                    className="relative z-10 px-6 -mb-7 space-y-1.5 max-w-[80%] pointer-events-auto"
+                    className="relative z-10 max-w-[78%] px-6 -mb-7 space-y-2.5 pointer-events-auto"
                   >
-                    <p className="text-white font-medium text-lg leading-snug flex items-center gap-2 flex-wrap">
-                      <span>{topic.title}</span>
+                    <p className="flex items-start gap-2 text-[22px] font-black leading-[1.05] tracking-normal text-white drop-shadow-[0_3px_14px_rgba(0,0,0,0.72)]">
+                      <span className="min-w-0">{topic.title}</span>
                       {isSpotlighted && (
-                        <span className="inline-flex items-center justify-center rounded-full bg-gold/15 border border-gold/20 w-6 h-6 text-gold">
+                        <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gold/25 bg-gold/18 text-gold shadow-[0_4px_14px_rgba(0,0,0,0.38)]">
                           <Flame size={11} className="fill-current" />
                         </span>
                       )}
                     </p>
-                    
-                    <div 
+
+                    <div
                       onClick={(e) => {
                         e.stopPropagation();
                         setExpandedCreatorsId(expandedCreatorsId === topic.id ? null : topic.id);
                       }}
-                      className="flex items-center gap-2 pt-2 cursor-pointer active:scale-95 transition-transform origin-left w-fit"
+                      className="flex w-fit origin-left cursor-pointer items-center gap-2 rounded-full bg-black/26 py-1 pr-2.5 active:scale-95 transition-transform backdrop-blur-[2px]"
                     >
                         <div className={`flex ${expandedCreatorsId === topic.id ? 'flex-wrap gap-2' : '-space-x-2'}`}>
                           {Array.from({ length: expandedCreatorsId === topic.id ? topic.joinedCount : Math.min(topic.joinedCount, 3) }).map((_, i) => (
-                            <motion.div 
+                            <motion.div
                               layout
-                              key={i} 
+                              key={i}
                               onClick={(e) => {
                                 if (expandedCreatorsId === topic.id) {
                                   e.stopPropagation();
@@ -3895,18 +4057,18 @@ const CircleScreen = ({
                                   setScreen('user-profile');
                                 }
                               }}
-                              className={`rounded-full border-2 border-dark overflow-hidden ${expandedCreatorsId === topic.id ? 'w-8 h-8 shadow-lg active:scale-90 transition-transform' : 'w-7 h-7'}`}
+                              className={`overflow-hidden rounded-full border-2 border-black/70 ${expandedCreatorsId === topic.id ? 'h-8 w-8 shadow-lg active:scale-90 transition-transform' : 'h-7 w-7'}`}
                             >
                               <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${topic.id + i}`} alt="" className="w-full h-full object-cover" />
                             </motion.div>
                           ))}
                           {expandedCreatorsId !== topic.id && topic.joinedCount > 3 && (
-                              <div className="w-7 h-7 rounded-full border-2 border-dark bg-white/10 backdrop-blur-md flex items-center justify-center -ml-2 z-10">
-                                <span className="text-[8px] font-black text-white">+{topic.joinedCount - 3}</span>
+                              <div className="z-10 -ml-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-black/70 bg-white/16 backdrop-blur-md">
+                                <span className="text-[8px] font-black text-white/90">+{topic.joinedCount - 3}</span>
                               </div>
                           )}
                         </div>
-                        <span className="text-[10px] font-black text-white/40 uppercase tracking-widest whitespace-nowrap">
+                        <span className="whitespace-nowrap text-[10px] font-black uppercase tracking-wider text-white/58 drop-shadow-[0_1px_6px_rgba(0,0,0,0.5)]">
                           {topic.status === 'completed' ? `${topic.joinedCount}人共创` : `还差 ${topic.targetCount - topic.joinedCount} 人即可解锁`}
                           <ChevronRight size={12} className={`inline-block ml-0.5 transition-transform ${expandedCreatorsId === topic.id ? 'rotate-90' : ''}`} />
                         </span>
@@ -3921,7 +4083,7 @@ const CircleScreen = ({
 
        <AnimatePresence>
         {showComments && (
-          <motion.div 
+          <motion.div
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -3938,7 +4100,7 @@ const CircleScreen = ({
                 <X size={20} />
               </button>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto px-6 space-y-6 no-scrollbar">
               {[
                 { name: '南川', text: '这种拼在一起的日常很有生命力。', time: '12h' },
@@ -3960,9 +4122,9 @@ const CircleScreen = ({
 
             <div className="p-6 bg-black/40 border-t border-white/5 pb-10">
               <div className="flex gap-3 items-center">
-                <input 
-                  type="text" 
-                  placeholder="留下你的共创注脚..." 
+                <input
+                  type="text"
+                  placeholder="留下你的共创注脚..."
                   className="flex-1 h-12 bg-white/5 border border-white/10 rounded-2xl px-5 text-sm font-bold focus:border-white/20 outline-none placeholder:text-white/10"
                 />
                 <button className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-dark">
@@ -4111,8 +4273,8 @@ const CircleScreen = ({
             >
               <div className="flex justify-between items-center px-6 mb-4">
                 <h3 className="text-white text-sm font-black tracking-[0.2em] uppercase">分享给好友</h3>
-                <button 
-                  onClick={() => setIsShareDrawerOpen(false)} 
+                <button
+                  onClick={() => setIsShareDrawerOpen(false)}
                   className="w-10 h-10 flex items-center justify-center bg-white/5 rounded-full text-white/40 active:scale-95 transition-transform"
                 >
                   <X size={18} />
@@ -4122,9 +4284,9 @@ const CircleScreen = ({
               {/* Multi-select Friends List */}
               <div className="flex gap-4 overflow-x-auto no-scrollbar px-6 pb-2">
                 {SHARE_FRIENDS.map((friend) => (
-                  <button 
-                    key={friend.id} 
-                    className="flex flex-col items-center gap-2 min-w-[64px] group relative" 
+                  <button
+                    key={friend.id}
+                    className="flex flex-col items-center gap-2 min-w-[64px] group relative"
                     onClick={() => toggleShareUser(friend.id)}
                   >
                     <div className={`w-14 h-14 rounded-full overflow-hidden border-2 transition-all p-0.5 active:scale-95 ${
@@ -4132,11 +4294,11 @@ const CircleScreen = ({
                     }`}>
                       <img src={friend.avatar} alt={friend.name} className="w-full h-full rounded-full object-cover" />
                     </div>
-                    
+
                     {/* Checkbox Overlay */}
                     <div className={`absolute top-0 right-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                        selectedShareUserIds.has(friend.id) 
-                        ? 'bg-red-primary border-red-primary opacity-100 scale-100' 
+                        selectedShareUserIds.has(friend.id)
+                        ? 'bg-red-primary border-red-primary opacity-100 scale-100'
                         : 'bg-black/20 border-white/20 opacity-40 scale-75'
                     }`}>
                       {selectedShareUserIds.has(friend.id) && <Check size={12} className="text-white" strokeWidth={4} />}
@@ -4154,13 +4316,13 @@ const CircleScreen = ({
               {/* Action Bar / Send Button */}
               <AnimatePresence>
                 {selectedShareUserIds.size > 0 && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 20 }}
                     className="px-6 py-2"
                   >
-                    <button 
+                    <button
                       onClick={() => {
                         showToast(`已向 ${selectedShareUserIds.size} 位好友发送共创邀请`);
                         setIsShareDrawerOpen(false);
@@ -4177,29 +4339,37 @@ const CircleScreen = ({
 
               {/* Other Sharing Channels */}
               <div className="flex gap-6 overflow-x-auto no-scrollbar px-6 pb-2">
-                <button key="drawer2-wechat" className="flex flex-col items-center gap-2 group" onClick={() => { showToast('正在跳转微信...'); setIsShareDrawerOpen(false); }}>
-                  <div className="w-12 h-12 bg-[#07C160]/10 border border-[#07C160]/20 rounded-2xl flex items-center justify-center text-[#07C160] active:scale-95 transition-transform">
-                    <MessageCircle size={24} />
-                  </div>
-                  <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">微信好友</span>
-                </button>
                 <button key="drawer2-gift" className="flex flex-col items-center gap-2 group" onClick={() => { setIsShareDrawerOpen(false); setIsGiftDrawerOpen(true); }}>
                   <div className="w-12 h-12 bg-[#FE2C55]/10 border border-[#FE2C55]/20 rounded-2xl flex items-center justify-center text-[#FE2C55] active:scale-95 transition-transform">
                     <Gift size={24} />
                   </div>
-                  <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">赠送</span>
+                  <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">赠送礼物</span>
                 </button>
-                <button key="drawer2-copy-link" className="flex flex-col items-center gap-2 group" onClick={() => { showToast('已复制链接'); setIsShareDrawerOpen(false); }}>
+                <button key="drawer2-save-album" className="flex flex-col items-center gap-2 group" onClick={() => { showToast('已保存到本地相册'); setIsShareDrawerOpen(false); }}>
                   <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-white/60 active:scale-95 transition-transform">
-                    <CornerUpRight size={20} />
+                    <ImageIcon size={20} />
                   </div>
-                  <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">复制链接</span>
+                  <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">保存至相册</span>
                 </button>
-                
-                <button 
+                <button
+                  key="drawer2-report"
+                  className="flex flex-col items-center gap-2 group"
+                  onClick={() => {
+                    setReportType('video');
+                    setReportTargetName(sharingTopic.title);
+                    setIsShareDrawerOpen(false);
+                    setScreen('report-user');
+                  }}
+                >
+                  <div className="w-12 h-12 bg-red-primary/10 border border-red-primary/20 rounded-2xl flex items-center justify-center text-red-primary active:scale-95 transition-transform">
+                    <AlertTriangle size={20} />
+                  </div>
+                  <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">举报作品</span>
+                </button>
+                <button
                   key="drawer2-copy-topic"
-                  className="flex flex-col items-center gap-2 group" 
-                  onClick={() => { 
+                  className="flex flex-col items-center gap-2 group"
+                  onClick={() => {
                     setIsShareDrawerOpen(false);
                     setCircleInitialTopicInfo(sharingTopic);
                     setScreen('create-circle');
@@ -4211,11 +4381,10 @@ const CircleScreen = ({
                   </div>
                   <span className="text-[9px] font-black text-white/40 group-active:text-white uppercase tracking-tighter">复制话题并创建</span>
                 </button>
-                
-                <button 
+                <button
                   key="drawer2-heat-topic"
-                  className="flex flex-col items-center gap-2 group" 
-                  onClick={() => { 
+                  className="flex flex-col items-center gap-2 group"
+                  onClick={() => {
                     setIsShareDrawerOpen(false);
                     setIsHeatingModalOpen(true);
                   }}
@@ -4254,8 +4423,8 @@ const CircleScreen = ({
             >
               <div className="flex justify-between items-center px-6 mb-6 flex-shrink-0">
                 <h3 className="text-white text-sm font-black tracking-[0.2em] uppercase">更多选项</h3>
-                <button 
-                  onClick={() => setIsMoreDrawerOpen(false)} 
+                <button
+                  onClick={() => setIsMoreDrawerOpen(false)}
                   className="w-10 h-10 flex items-center justify-center bg-white/5 rounded-full text-white/40 active:scale-95 transition-transform"
                 >
                   <X size={18} />
@@ -4265,8 +4434,11 @@ const CircleScreen = ({
               <div className="px-6 grid grid-cols-3 gap-4 mb-8 flex-shrink-0">
                 {[
                   { icon: <CornerUpRight size={20} />, label: '分享片段', action: () => { setIsMoreDrawerOpen(false); setIsShareDrawerOpen(true); } },
-                  { icon: <ShieldCheck size={20} />, label: '权限设置', action: () => { setIsMoreDrawerOpen(false); setIsVisibilityDrawerOpen(true); } },
-                  { icon: <Trash2 size={20} className="text-red-primary" />, label: '删除作品', action: () => { showToast('作品已申请删除'); setIsMoreDrawerOpen(false); } },
+                  { icon: <AlertTriangle size={20} className="text-red-primary" />, label: '举报作品', action: () => { setReportType('video'); setReportTargetName(sharingTopic.title); setIsMoreDrawerOpen(false); setScreen('report-user'); } },
+                  ...(isMyWorkMode ? [
+                    { icon: <ShieldCheck size={20} />, label: '权限设置', action: () => { setIsMoreDrawerOpen(false); setIsVisibilityDrawerOpen(true); } },
+                    { icon: <Trash2 size={20} className="text-red-primary" />, label: '删除作品', action: () => { showToast('作品已申请删除'); setIsMoreDrawerOpen(false); } },
+                  ] : []),
                 ].map((item, i) => (
                   <button key={i} onClick={item.action} className="flex flex-col items-center gap-3 group">
                     <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-white/60 active:scale-95 transition-all group-hover:bg-white/10 group-hover:text-white">
@@ -4288,7 +4460,7 @@ const CircleScreen = ({
         )}
       </AnimatePresence>
 
-      <VisibilitySelectorDrawer 
+      <VisibilitySelectorDrawer
         isOpen={isVisibilityDrawerOpen}
         onClose={() => setIsVisibilityDrawerOpen(false)}
         visibility={visibility}
@@ -4404,7 +4576,7 @@ const EnergyDetailScreen = ({ setScreen, prevScreen, balance }: { setScreen: (s:
                 <Flame size={24} fill="currentColor" />
               </div>
             </div>
-            
+
             <div className="mt-8 grid grid-cols-2 gap-4">
               <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
                 <p className="text-[10px] font-black text-white/30 uppercase mb-1">今日获得</p>
@@ -4421,7 +4593,7 @@ const EnergyDetailScreen = ({ setScreen, prevScreen, balance }: { setScreen: (s:
         {/* Info Explainer */}
         <AnimatePresence>
           {showInfo && (
-            <motion.section 
+            <motion.section
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -4460,7 +4632,7 @@ const EnergyDetailScreen = ({ setScreen, prevScreen, balance }: { setScreen: (s:
               { id: 'get', label: '获取' },
               { id: 'use', label: '消耗' }
             ].map((tab) => (
-              <button 
+              <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${
@@ -4484,7 +4656,7 @@ const EnergyDetailScreen = ({ setScreen, prevScreen, balance }: { setScreen: (s:
         {/* Transaction History List */}
         <section className="px-6 space-y-3">
           {filteredTransactions.map((tx, i) => (
-            <motion.div 
+            <motion.div
               key={tx.id}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -4545,7 +4717,7 @@ const EnergyDetailScreen = ({ setScreen, prevScreen, balance }: { setScreen: (s:
       </main>
 
       <footer className="p-6 pt-0 bg-dark/80 backdrop-blur-md border-t border-white/[0.03]">
-         <button 
+         <button
            onClick={() => setScreen('shop')}
            className="w-full h-14 bg-white text-dark rounded-[24px] font-black uppercase text-xs shadow-2xl active:scale-95 transition-transform flex items-center justify-center gap-2"
          >
@@ -4581,8 +4753,8 @@ const VideoEditScreen = ({ topic, setScreen, showToast, onPost, source = 'join' 
     <div className="flex flex-col h-full bg-black relative">
        {/* Header */}
        <div className="absolute top-0 inset-x-0 pt-12 pb-4 flex items-center justify-between px-6 z-30 bg-gradient-to-b from-black/80 to-transparent">
-          <button 
-            onClick={() => setScreen(source === 'create' ? 'create-and-shoot' : 'join')} 
+          <button
+            onClick={() => setScreen(source === 'create' ? 'create-and-shoot' : 'join')}
             className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white backdrop-blur-md"
           >
             <ArrowLeft size={20} />
@@ -4595,12 +4767,12 @@ const VideoEditScreen = ({ topic, setScreen, showToast, onPost, source = 'join' 
        <div className="flex-1 flex flex-col items-center justify-center p-6 pt-20 pb-4 overflow-hidden">
           <div className="w-full max-h-[450px] aspect-[9/16] rounded-[40px] bg-[#111] shadow-2xl border border-white/10 relative overflow-hidden flex flex-col items-center justify-center transition-all duration-500">
              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20"></div>
-             
+
              {/* Subtitle Overlay */}
              <div className="absolute top-1/2 inset-x-8 -translate-y-1/2 text-center z-10 px-4">
                 <AnimatePresence>
                   {subtitle && (
-                    <motion.p 
+                    <motion.p
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       className="text-white text-lg font-bold drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)] leading-tight"
@@ -4614,7 +4786,7 @@ const VideoEditScreen = ({ topic, setScreen, showToast, onPost, source = 'join' 
              {/* Timestamp Overlay */}
              <AnimatePresence>
                {enableTimestamp && (
-                 <motion.div 
+                 <motion.div
                    initial={{ opacity: 0, x: -10 }}
                    animate={{ opacity: 1, x: 0 }}
                    exit={{ opacity: 0, x: -10 }}
@@ -4650,8 +4822,8 @@ const VideoEditScreen = ({ topic, setScreen, showToast, onPost, source = 'join' 
                 <span className="text-[9px] text-white/10 uppercase font-black">{subtitle.length}/30</span>
              </div>
              <div className="relative group">
-                <input 
-                  className={`w-full h-12 bg-white/5 rounded-xl px-5 pr-12 font-bold outline-none border transition-all ${isEditingText ? 'border-gold bg-white/10' : 'border-white/5 focus:border-white/20'} text-sm text-white`} 
+                <input
+                  className={`w-full h-12 bg-white/5 rounded-xl px-5 pr-12 font-bold outline-none border transition-all ${isEditingText ? 'border-gold bg-white/10' : 'border-white/5 focus:border-white/20'} text-sm text-white`}
                   placeholder="给这段作品加句内心独白..."
                   maxLength={30}
                   value={subtitle}
@@ -4669,7 +4841,7 @@ const VideoEditScreen = ({ topic, setScreen, showToast, onPost, source = 'join' 
              </div>
           </div>
 
-          <div 
+          <div
             onClick={() => setEnableTimestamp(!enableTimestamp)}
             className={`flex items-center justify-between p-4 bg-white/5 rounded-2xl border transition-all cursor-pointer active:scale-[0.98] ${enableTimestamp ? 'border-gold/30' : 'border-white/5'}`}
           >
@@ -4682,10 +4854,10 @@ const VideoEditScreen = ({ topic, setScreen, showToast, onPost, source = 'join' 
                    <p className="text-[9px] text-white/30 uppercase tracking-tighter">在视频左上角标记拍摄时刻</p>
                 </div>
              </div>
-             <div 
+             <div
                className={`w-10 h-5 rounded-full relative transition-colors duration-300 ${enableTimestamp ? 'bg-gold' : 'bg-white/10'}`}
              >
-                <motion.div 
+                <motion.div
                   animate={{ x: enableTimestamp ? 22 : 2 }}
                   className="absolute top-1 left-0 w-3 h-3 bg-white rounded-full shadow-lg"
                 />
@@ -4693,14 +4865,14 @@ const VideoEditScreen = ({ topic, setScreen, showToast, onPost, source = 'join' 
           </div>
 
           <div className="flex gap-4 pt-1">
-             <button 
-               onClick={() => setScreen(source === 'create' ? 'create-and-shoot' : 'join')} 
+             <button
+               onClick={() => setScreen(source === 'create' ? 'create-and-shoot' : 'join')}
                disabled={posting}
                className="flex-1 h-14 bg-white/5 border border-white/5 rounded-2xl font-black uppercase text-[10px] tracking-widest active:scale-95 transition-all text-white/40 flex items-center justify-center gap-2"
              >
                 <RotateCw size={14} /> 重拍
              </button>
-             <button 
+             <button
                onClick={handlePost}
                disabled={posting}
                className="flex-[2] h-14 bg-white text-dark rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-2 relative overflow-hidden"
@@ -4709,7 +4881,7 @@ const VideoEditScreen = ({ topic, setScreen, showToast, onPost, source = 'join' 
                   <>
                     <RotateCw size={14} className="animate-spin" />
                     <span>发布中...</span>
-                    <motion.div 
+                    <motion.div
                       className="absolute bottom-0 left-0 h-1 bg-gold"
                       initial={{ width: 0 }}
                       animate={{ width: '100%' }}
@@ -4780,7 +4952,7 @@ const FeedbackScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
           value={feedbackText}
           onChange={(e) => setFeedbackText(e.target.value)}
         />
-        
+
         <div className="flex items-center gap-4">
            <input type="file" onChange={handleImageUpload} className="hidden" id="image-upload" />
            <label htmlFor="image-upload" className="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center text-white/40 border border-white/10 cursor-pointer">
@@ -4840,6 +5012,11 @@ export default function App() {
   const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
   const [isGiftDonorDetailModalOpen, setIsGiftDonorDetailModalOpen] = useState(false);
   const [hasShownHomeGrowthPrompt, setHasShownHomeGrowthPrompt] = useState(false);
+  const [isCirclePureMode, setIsCirclePureMode] = useState(false);
+  const [blockedUserNames, setBlockedUserNames] = useState<Set<string>>(new Set());
+  const [userRemarks, setUserRemarks] = useState<Record<string, string>>({});
+  const [reportTargetName, setReportTargetName] = useState('林野');
+  const [reportType, setReportType] = useState<'account' | 'video'>('account');
 
   useEffect(() => {
     if (screen === 'splash') {
@@ -4859,18 +5036,18 @@ export default function App() {
     if (!window.confirm('确定要删除这段记录吗？删除后该话题的共创人数将减少。')) {
       return;
     }
-    
+
     const vlogToDelete = userVlogs.find(v => v.id === vlogId);
     if (!vlogToDelete) return;
 
     setUserVlogs(prev => prev.filter(v => v.id !== vlogId));
-    
-    setTopics(prev => prev.map(t => 
-      t.id === vlogToDelete.topicId 
-        ? { ...t, joinedCount: Math.max(0, t.joinedCount - 1) } 
+
+    setTopics(prev => prev.map(t =>
+      t.id === vlogToDelete.topicId
+        ? { ...t, joinedCount: Math.max(0, t.joinedCount - 1) }
         : t
     ));
-    
+
     if (selectedTopic && selectedTopic.id === vlogToDelete.topicId) {
       setSelectedTopic(prev => prev ? { ...prev, joinedCount: Math.max(0, prev.joinedCount - 1) } : null);
     }
@@ -4892,12 +5069,12 @@ export default function App() {
       image: `https://api.dicebear.com/7.x/identicon/svg?seed=${Date.now()}`,
       likes: '0'
     };
-    
+
     setUserVlogs(prev => [newVlog, ...prev]);
-    
-    setTopics(prev => prev.map(t => 
-      t.id === topic.id 
-        ? { ...t, joinedCount: t.joinedCount + 1 } 
+
+    setTopics(prev => prev.map(t =>
+      t.id === topic.id
+        ? { ...t, joinedCount: t.joinedCount + 1 }
         : t
     ));
 
@@ -4908,7 +5085,28 @@ export default function App() {
 
   const handleSetScreen = (newScreen: Screen) => {
     setPrevScreen(screen);
+    if (newScreen !== 'circle') {
+      setIsCirclePureMode(false);
+    }
     setScreen(newScreen);
+  };
+
+  const blockUser = (name: string) => {
+    setBlockedUserNames(prev => {
+      const next = new Set(prev);
+      next.add(name);
+      return next;
+    });
+    showToast('已加入黑名单');
+  };
+
+  const unblockUser = (name: string) => {
+    setBlockedUserNames(prev => {
+      const next = new Set(prev);
+      next.delete(name);
+      return next;
+    });
+    showToast('已解除拉黑');
   };
 
   const dismissHomeGrowthPrompt = () => {
@@ -4939,7 +5137,7 @@ export default function App() {
       showToast('钻石余额不足，请先充值');
       return;
     }
-    
+
     setDiamondBalance(prev => prev - cost);
     setSpotlightTopicIds(prev => {
       const next = new Set(prev);
@@ -4965,11 +5163,11 @@ const GiftScreen = ({ setScreen, prevScreen, showToast }: { setScreen: (s: Scree
             <span className="font-bold text-sm">628</span>
             <button onClick={() => setScreen('recharge')} className="text-[10px] text-indigo-400 font-black uppercase tracking-widest ml-1">充值</button>
          </div>
-         <button 
+         <button
            onClick={() => {
              showToast('礼物已送出，稍后将在评论区展示！');
              setTimeout(() => setScreen(prevScreen), 800);
-           }} 
+           }}
            className="h-12 px-10 bg-white text-dark rounded-full font-black text-xs uppercase shadow-2xl active:scale-95 transition-transform"
          >
             立即赠送
@@ -4988,56 +5186,60 @@ const GiftScreen = ({ setScreen, prevScreen, showToast }: { setScreen: (s: Scree
         return <LoginScreen setScreen={sS} showToast={showToast} />;
       case 'home':
         return (
-          <HomeScreen 
-            setScreen={sS} 
-            setSelectedTopic={setSelectedTopic} 
+          <HomeScreen
+            setScreen={sS}
+            setSelectedTopic={setSelectedTopic}
             topics={topics}
-            savedTopicIds={savedTopicIds} 
-            toggleFavorite={toggleFavorite} 
+            savedTopicIds={savedTopicIds}
+            toggleFavorite={toggleFavorite}
             likedTopicIds={likedTopicIds}
             toggleLike={toggleLike}
-            setSelectedUserName={setSelectedUserName} 
+            setSelectedUserName={setSelectedUserName}
             spotlightTopicIds={spotlightTopicIds}
             spotlightTopic={spotlightTopic}
             showToast={showToast}
             showGrowthPrompt={!hasShownHomeGrowthPrompt}
             dismissGrowthPrompt={dismissHomeGrowthPrompt}
+            setCircleInitialTopicId={setCircleInitialTopicId}
           />
         );
       case 'topic-detail':
         return selectedTopic ? (
-          <TopicDetail 
-            topic={selectedTopic} 
-            setScreen={sS} 
+          <TopicDetail
+            topic={selectedTopic}
+            setScreen={sS}
             prevScreen={prevScreen}
-            toggleFavorite={toggleFavorite} 
-            isFavorite={savedTopicIds.has(selectedTopic.id)} 
+            toggleFavorite={toggleFavorite}
+            isFavorite={savedTopicIds.has(selectedTopic.id)}
             toggleLike={toggleLike}
             isLiked={likedTopicIds.has(selectedTopic.id)}
-            setSelectedTopic={setSelectedTopic} 
-            setSelectedUserName={setSelectedUserName} 
+            setSelectedTopic={setSelectedTopic}
+            setSelectedUserName={setSelectedUserName}
             showToast={showToast}
             isSpotlighted={spotlightTopicIds.has(selectedTopic.id)}
             spotlightTopic={spotlightTopic}
             userVlogs={userVlogs}
             deleteVlog={deleteVlog}
             setCircleInitialTopicInfo={setCircleInitialTopicInfo}
+            setReportTargetName={setReportTargetName}
+            setReportType={setReportType}
           />
         ) : (
-          <HomeScreen 
-            setScreen={sS} 
-            setSelectedTopic={setSelectedTopic} 
-            topics={topics} 
-            savedTopicIds={savedTopicIds} 
-            toggleFavorite={toggleFavorite} 
-            likedTopicIds={likedTopicIds} 
-            toggleLike={toggleLike} 
-            setSelectedUserName={setSelectedUserName} 
-            spotlightTopicIds={spotlightTopicIds} 
-            spotlightTopic={spotlightTopic} 
-            showToast={showToast} 
+          <HomeScreen
+            setScreen={sS}
+            setSelectedTopic={setSelectedTopic}
+            topics={topics}
+            savedTopicIds={savedTopicIds}
+            toggleFavorite={toggleFavorite}
+            likedTopicIds={likedTopicIds}
+            toggleLike={toggleLike}
+            setSelectedUserName={setSelectedUserName}
+            spotlightTopicIds={spotlightTopicIds}
+            spotlightTopic={spotlightTopic}
+            showToast={showToast}
             showGrowthPrompt={!hasShownHomeGrowthPrompt}
             dismissGrowthPrompt={dismissHomeGrowthPrompt}
+            setCircleInitialTopicId={setCircleInitialTopicId}
           />
         );
       case 'create-circle':
@@ -5048,12 +5250,12 @@ const GiftScreen = ({ setScreen, prevScreen, showToast }: { setScreen: (s: Scree
         return <CreateSuccessScreen setScreen={sS} showToast={showToast} />;
       case 'circle':
         return (
-          <CircleScreen 
-            setScreen={sS} 
+          <CircleScreen
+            setScreen={sS}
             prevScreen={prevScreen}
             topics={topics}
-            setSelectedTopic={setSelectedTopic} 
-            setSelectedUserName={setSelectedUserName} 
+            setSelectedTopic={setSelectedTopic}
+            setSelectedUserName={setSelectedUserName}
             savedTopicIds={savedTopicIds}
             toggleFavorite={toggleFavorite}
             likedTopicIds={likedTopicIds}
@@ -5070,6 +5272,9 @@ const GiftScreen = ({ setScreen, prevScreen, showToast }: { setScreen: (s: Scree
             setCircleInitialTopicInfo={setCircleInitialTopicInfo}
             isGiftDonorDetailModalOpen={isGiftDonorDetailModalOpen}
             setIsGiftDonorDetailModalOpen={setIsGiftDonorDetailModalOpen}
+            setCirclePureMode={setIsCirclePureMode}
+            setReportTargetName={setReportTargetName}
+            setReportType={setReportType}
           />
         );
       case 'feedback':
@@ -5078,12 +5283,12 @@ const GiftScreen = ({ setScreen, prevScreen, showToast }: { setScreen: (s: Scree
         return selectedTopic ? <JoinScreen topic={selectedTopic} setScreen={sS} showToast={showToast} /> : <div className="flex flex-col items-center justify-center h-full text-white/40"><p>请先选择话题</p><button onClick={() => sS('home')} className="mt-4 px-6 py-2 glass-pill">返回首页</button></div>;
       case 'video-edit':
         return (
-          <VideoEditScreen 
-            topic={selectedTopic || topics[0]} 
-            setScreen={sS} 
-            showToast={showToast} 
+          <VideoEditScreen
+            topic={selectedTopic || topics[0]}
+            setScreen={sS}
+            showToast={showToast}
             onPost={handlePostVlog}
-            source={(selectedTopic?.creator === CURRENT_USER.name && (prevScreen === 'join' || prevScreen === 'create-and-shoot')) ? 'create' : 'join'} 
+            source={(selectedTopic?.creator === CURRENT_USER.name && (prevScreen === 'join' || prevScreen === 'create-and-shoot')) ? 'create' : 'join'}
           />
         );
       case 'join-success':
@@ -5116,6 +5321,8 @@ const GiftScreen = ({ setScreen, prevScreen, showToast }: { setScreen: (s: Scree
         return <RechargeScreen setScreen={sS} balance={diamondBalance} />;
       case 'settings':
         return <SettingsScreen setScreen={sS} />;
+      case 'blacklist':
+        return <BlacklistScreen setScreen={sS} blockedUserNames={[...blockedUserNames]} unblockUser={unblockUser} />;
       case 'friends':
         return <FriendsScreen setScreen={sS} setSelectedUserName={setSelectedUserName} initialTab={initialNetworkTab} />;
       case 'network-list':
@@ -5125,7 +5332,20 @@ const GiftScreen = ({ setScreen, prevScreen, showToast }: { setScreen: (s: Scree
       case 'saved-topics':
         return <SavedTopicsScreen setScreen={sS} topics={topics} savedTopicIds={savedTopicIds} setSelectedTopic={setSelectedTopic} />;
       case 'dm':
-        return <DMScreen setScreen={sS} setSelectedUserName={setSelectedUserName} />;
+        return (
+          <DMScreen
+            setScreen={sS}
+            setSelectedUserName={setSelectedUserName}
+            userName={selectedUserName}
+            showToast={showToast}
+            userRemarks={userRemarks}
+            setUserRemarks={setUserRemarks}
+            blockedUserNames={blockedUserNames}
+            blockUser={blockUser}
+            setReportTargetName={setReportTargetName}
+            setReportType={setReportType}
+          />
+        );
       case 'relation-invite':
         return <RelationInviteScreen setScreen={sS} />;
       case 'relation-sent':
@@ -5133,7 +5353,24 @@ const GiftScreen = ({ setScreen, prevScreen, showToast }: { setScreen: (s: Scree
       case 'relation-review':
         return <RelationReviewScreen setScreen={sS} showToast={showToast} />;
       case 'user-profile':
-        return <UserProfileScreen setScreen={sS} userName={selectedUserName} prevScreen={prevScreen} showToast={showToast} setInitialNetworkTab={setInitialNetworkTab} />;
+        return (
+          <UserProfileScreen
+            setScreen={sS}
+            userName={selectedUserName}
+            prevScreen={prevScreen}
+            showToast={showToast}
+            setInitialNetworkTab={setInitialNetworkTab}
+            userRemarks={userRemarks}
+            setUserRemarks={setUserRemarks}
+            blockedUserNames={blockedUserNames}
+            blockUser={blockUser}
+            setReportTargetName={setReportTargetName}
+          />
+        );
+      case 'report-user':
+        return <ReportUserScreen setScreen={sS} targetName={reportTargetName} reportType={reportType} showToast={showToast} />;
+      case 'report-success':
+        return <ReportSuccessScreen setScreen={sS} targetName={reportTargetName} />;
       case 'personal-profile':
         return <PersonalProfileScreen setScreen={sS} profile={profile} setProfile={setProfile} showToast={showToast} />;
       case 'gift':
@@ -5193,7 +5430,7 @@ const GiftScreen = ({ setScreen, prevScreen, showToast }: { setScreen: (s: Scree
 
       <AnimatePresence>
         {toast && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -5204,11 +5441,11 @@ const GiftScreen = ({ setScreen, prevScreen, showToast }: { setScreen: (s: Scree
         )}
       </AnimatePresence>
 
-      {(screen === 'home' || screen === 'circle' || screen === 'messages' || screen === 'me') && (
+      {(screen === 'home' || screen === 'circle' || screen === 'messages' || screen === 'me') && !(screen === 'circle' && isCirclePureMode) && (
         <>
-          <BottomNav 
-            active={screen} 
-            setScreen={handleSetScreen} 
+          <BottomNav
+            active={screen}
+            setScreen={handleSetScreen}
             onPlusClick={() => {
               setCircleInitialTopicInfo(undefined);
               handleSetScreen('create-circle');
@@ -5230,10 +5467,10 @@ const SplashScreen = () => {
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#FFD700]/5 blur-[120px] rounded-full" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#FFD700]/5 blur-[150px] rounded-full" />
       </div>
-      
+
       <div className="relative z-10 flex flex-col items-center">
         <Logo size={100} className="mb-10" />
-        
+
         <div className="flex flex-col items-center">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
@@ -5247,7 +5484,7 @@ const SplashScreen = () => {
               <div className="h-[1px] w-8 bg-[#D4AF37]/30" />
             </div>
           </motion.div>
-          
+
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -5266,11 +5503,11 @@ const SplashScreen = () => {
             key={i}
             initial={{ opacity: 0.2 }}
             animate={{ opacity: [0.2, 1, 0.2] }}
-            transition={{ 
-              duration: 1.5, 
-              repeat: Infinity, 
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
               delay: i * 0.2,
-              ease: "easeInOut" 
+              ease: "easeInOut"
             }}
             className="w-1.5 h-1.5 rounded-full bg-[#FFD700]"
           />
@@ -5355,13 +5592,43 @@ const SmartRingScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) => {
 
 // --- DM (Chat) Screen ---
 
-const DMScreen = ({ setScreen, setSelectedUserName }: { setScreen: (s: Screen) => void, setSelectedUserName: (name: string) => void }) => {
-  const userName = "林野";
+const DMScreen = ({
+  setScreen,
+  setSelectedUserName,
+  userName,
+  showToast,
+  userRemarks,
+  setUserRemarks,
+  blockedUserNames,
+  blockUser,
+  setReportTargetName,
+  setReportType,
+}: {
+  setScreen: (s: Screen) => void,
+  setSelectedUserName: (name: string) => void,
+  userName: string,
+  showToast: (m: string) => void,
+  userRemarks: Record<string, string>,
+  setUserRemarks: React.Dispatch<React.SetStateAction<Record<string, string>>>,
+  blockedUserNames: Set<string>,
+  blockUser: (name: string) => void,
+  setReportTargetName: (name: string) => void,
+  setReportType: (type: 'account' | 'video') => void,
+}) => {
   const [msg, setMsg] = useState('');
   const [isVoiceMode, setIsVoiceMode] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
+  const [isToolsOpen, setIsToolsOpen] = useState(false);
+  const [isGiftPanelOpen, setIsGiftPanelOpen] = useState(false);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isFollowed, setIsFollowed] = useState(true);
+  const [isRemarkOpen, setIsRemarkOpen] = useState(false);
+  const [remarkDraft, setRemarkDraft] = useState(userRemarks[userName] || '');
+  const [isBlockConfirmOpen, setIsBlockConfirmOpen] = useState(false);
   const emojis = ['😀', '😂', '😍', '🥰', '👍', '🔥', '🎁', '💎', '❤️', '👏', '😎', '😭'];
+  const remarkName = userRemarks[userName];
+  const isBlocked = blockedUserNames.has(userName);
   const [messages, setMessages] = useState([
     { id: 1, text: '我刚拍了一段 3 秒片段，顺手把声音也录进去了。', sender: 'other', time: '09:41' },
     { id: 2, text: '我这边也补好了，今天的城市声音很完整。', sender: 'me', time: '09:42' },
@@ -5417,6 +5684,36 @@ const DMScreen = ({ setScreen, setSelectedUserName }: { setScreen: (s: Screen) =
     setIsVoiceMode(false);
     setMsg(prev => `${prev}${emoji}`);
   };
+  const saveRemark = () => {
+    const nextRemark = remarkDraft.trim();
+    setUserRemarks(prev => {
+      const next = { ...prev };
+      if (nextRemark) next[userName] = nextRemark;
+      else delete next[userName];
+      return next;
+    });
+    setIsRemarkOpen(false);
+    showToast(nextRemark ? '备注已保存' : '备注已清除');
+  };
+  const handleFollowToggle = () => {
+    setIsFollowed(prev => {
+      const next = !prev;
+      showToast(next ? '已关注' : '已取消关注');
+      return next;
+    });
+    setIsMoreOpen(false);
+  };
+  const handleReport = () => {
+    setReportType('account');
+    setReportTargetName(userName);
+    setIsMoreOpen(false);
+    setScreen('report-user');
+  };
+  const handleBlock = () => {
+    blockUser(userName);
+    setIsBlockConfirmOpen(false);
+    setIsMoreOpen(false);
+  };
 
   return (
     <div className="flex flex-col h-full bg-[#f7f7f7] pt-8 text-[#161616] relative overflow-hidden">
@@ -5428,9 +5725,9 @@ const DMScreen = ({ setScreen, setSelectedUserName }: { setScreen: (s: Screen) =
             setSelectedUserName(userName);
             setScreen('user-profile');
         }}>
-           <h2 className="font-black text-[#161616] text-base">{userName}</h2>
+           <h2 className="font-black text-[#161616] text-base">{remarkName || userName}</h2>
         </div>
-        <button onClick={() => setScreen('user-profile')} className="w-10 h-10 rounded-full flex items-center justify-center bg-white text-[#161616] shadow-sm active:scale-95 transition-transform">
+        <button onClick={() => setIsMoreOpen(true)} className="w-10 h-10 rounded-full flex items-center justify-center bg-white text-[#161616] shadow-sm active:scale-95 transition-transform" aria-label="聊天更多操作">
           <MoreHorizontal size={20} />
         </button>
       </header>
@@ -5444,8 +5741,8 @@ const DMScreen = ({ setScreen, setSelectedUserName }: { setScreen: (s: Screen) =
            <div key={m.id} className={`flex gap-2.5 ${m.sender === 'me' ? 'flex-row-reverse' : 'flex-row'} max-w-full animate-in fade-in slide-in-from-bottom-2`}>
               <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${m.sender === 'me' ? 'Dear6317B6SG' : userName}`} alt="" className="w-9 h-9 rounded-full bg-white shrink-0 object-cover" />
               <div className={`max-w-[72%] px-3.5 py-2.5 shadow-sm space-y-1.5 ${
-                m.sender === 'me' 
-                ? 'bg-[#FE2C55] rounded-[18px] rounded-tr-[4px] text-white' 
+                m.sender === 'me'
+                ? 'bg-[#FE2C55] rounded-[18px] rounded-tr-[4px] text-white'
                 : 'bg-white rounded-[18px] rounded-tl-[4px] text-[#161616]'
               }`}>
                  {(m as any).image ? (
@@ -5479,16 +5776,8 @@ const DMScreen = ({ setScreen, setSelectedUserName }: { setScreen: (s: Screen) =
       </main>
 
       <div className="absolute inset-x-0 bottom-0 z-50 bg-[#f7f7f7]/96 backdrop-blur-xl px-3 pt-2 pb-6">
-         <div className="h-12 rounded-full flex items-center pr-1.5 pl-2 gap-2 bg-white shadow-[0_8px_28px_rgba(0,0,0,0.08)]">
-            <button
-              onClick={() => {
-                setIsVoiceMode(prev => !prev);
-                setIsEmojiOpen(false);
-              }}
-              className={`w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition-transform ${isVoiceMode ? 'bg-[#161616] text-white' : 'text-[#161616]'}`}
-            >
-               <Mic size={20} />
-            </button>
+         <div className="rounded-[26px] bg-white px-2 pb-2 pt-2 shadow-[0_8px_28px_rgba(0,0,0,0.08)]">
+           <div className="flex h-11 items-center gap-2">
             {isVoiceMode ? (
               <button
                 onPointerDown={() => setIsRecording(true)}
@@ -5501,26 +5790,13 @@ const DMScreen = ({ setScreen, setSelectedUserName }: { setScreen: (s: Screen) =
             ) : (
               <input
                 className="flex-1 bg-[#f4f4f4] h-9 rounded-full px-4 text-sm font-medium placeholder:text-[#a5a5a5] outline-none text-[#161616]"
-                placeholder="想对林野说点什么..."
+                placeholder={`想对${remarkName || userName}说点什么...`}
                 value={msg}
                 onChange={(e) => setMsg(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               />
             )}
             <button
-              onClick={() => {
-                setIsEmojiOpen(prev => !prev);
-                setIsVoiceMode(false);
-              }}
-              className={`w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition-transform ${isEmojiOpen ? 'bg-[#161616] text-white' : 'text-[#161616]'}`}
-            >
-               <Smile size={19} />
-            </button>
-            <label className="w-9 h-9 rounded-full flex items-center justify-center text-[#161616] active:scale-95 transition-transform cursor-pointer">
-               <ImageIcon size={19} />
-               <input type="file" accept="image/*" className="hidden" onChange={handleImageSend} />
-            </label>
-            <button 
               onClick={handleSend}
               disabled={!msg.trim()}
               className={`h-9 min-w-[58px] px-4 font-black rounded-full text-xs whitespace-nowrap transition-all ${
@@ -5529,6 +5805,34 @@ const DMScreen = ({ setScreen, setSelectedUserName }: { setScreen: (s: Screen) =
             >
                发送
             </button>
+           </div>
+
+           <div className="mt-2 flex items-center justify-around border-t border-[#f1eee9] pt-2">
+             {[
+               { label: isVoiceMode ? '键盘' : '语音', icon: Mic, active: isVoiceMode, action: () => { setIsVoiceMode(prev => !prev); setIsEmojiOpen(false); setIsGiftPanelOpen(false); } },
+               { label: '表情', icon: Smile, active: isEmojiOpen, action: () => { setIsEmojiOpen(prev => !prev); setIsVoiceMode(false); setIsGiftPanelOpen(false); } },
+               { label: '图片', icon: ImageIcon, active: false, action: undefined },
+               { label: '礼物', icon: Gift, active: isGiftPanelOpen, action: () => { setIsGiftPanelOpen(prev => !prev); setIsEmojiOpen(false); setIsVoiceMode(false); } },
+             ].map((tool) => (
+               tool.label === '图片' ? (
+                 <label key={tool.label} className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-[#7d6f61] active:scale-90 transition-transform" aria-label={tool.label}>
+                   <tool.icon size={22} strokeWidth={2.3} />
+                   <input type="file" accept="image/*" className="hidden" onChange={handleImageSend} />
+                 </label>
+               ) : (
+                 <button
+                   key={tool.label}
+                   onClick={tool.action}
+                   aria-label={tool.label}
+                   className={`flex h-10 w-10 items-center justify-center rounded-full active:scale-90 transition-all ${
+                     tool.active ? 'bg-[#2f261d]/8 text-[#2f261d]' : 'text-[#7d6f61]'
+                   }`}
+                 >
+                   <tool.icon size={22} strokeWidth={2.3} />
+                 </button>
+               )
+             ))}
+           </div>
          </div>
          {isEmojiOpen && (
            <div className="mt-2 rounded-[22px] bg-white p-3 shadow-[0_8px_28px_rgba(0,0,0,0.08)] grid grid-cols-6 gap-2">
@@ -5543,7 +5847,145 @@ const DMScreen = ({ setScreen, setSelectedUserName }: { setScreen: (s: Screen) =
              ))}
            </div>
          )}
+         {isGiftPanelOpen && (
+           <div className="mt-2 grid grid-cols-4 gap-2 rounded-[22px] bg-white p-3 shadow-[0_8px_28px_rgba(0,0,0,0.08)]">
+             {GIFTS.slice(0, 4).map((gift) => (
+               <button
+                 key={gift.name}
+                 onClick={() => {
+                   setMessages(prev => [...prev, {
+                     id: Date.now(),
+                     text: `送出 ${gift.name}`,
+                     sender: 'me',
+                     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                   }]);
+                   setIsGiftPanelOpen(false);
+                   showToast(`已送出${gift.name}`);
+                 }}
+                 className="rounded-2xl bg-[#fffaf4] px-2 py-3 text-center active:scale-95 transition-transform"
+               >
+                 <span className="block text-2xl leading-none">{gift.icon}</span>
+                 <span className="mt-1 block truncate text-[9px] font-black text-[#2f261d]">{gift.name}</span>
+               </button>
+             ))}
+           </div>
+         )}
       </div>
+
+      <AnimatePresence>
+        {isMoreOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[80] flex flex-col justify-end bg-black/28 backdrop-blur-sm"
+            onClick={() => setIsMoreOpen(false)}
+          >
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 260 }}
+              className="rounded-t-[32px] bg-[#fffaf5] px-5 pb-8 pt-3 shadow-[0_-18px_50px_rgba(73,55,39,0.16)]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#eadfce]" />
+              <div className="mb-4 flex items-center gap-3">
+                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${userName}`} alt="" className="h-11 w-11 rounded-2xl bg-[#f6ede3]" />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-black text-[#2f261d]">{remarkName || userName}</p>
+                  {remarkName && <p className="text-[10px] font-black uppercase tracking-widest text-[#a79584]">原名 {userName}</p>}
+                </div>
+              </div>
+              {[
+                { label: '设置备注', icon: Pencil, action: () => { setIsMoreOpen(false); setRemarkDraft(userRemarks[userName] || ''); setIsRemarkOpen(true); } },
+                { label: isFollowed ? '取消关注' : '关注', icon: UserPlus, action: handleFollowToggle },
+                { label: '举报', icon: AlertTriangle, action: handleReport, danger: true },
+                { label: '拉黑', icon: Lock, action: () => setIsBlockConfirmOpen(true), danger: true },
+              ].map(item => (
+                <button
+                  key={item.label}
+                  onClick={item.action}
+                  className={`flex w-full items-center gap-3 rounded-[20px] px-4 py-3.5 text-left active:bg-[#f6ede3] transition-colors ${
+                    item.danger ? 'text-rose-500' : 'text-[#2f261d]'
+                  }`}
+                >
+                  <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${item.danger ? 'bg-rose-50' : 'bg-[#f6ede3]'}`}>
+                    <item.icon size={17} />
+                  </span>
+                  <span className="text-sm font-black">{item.label}</span>
+                </button>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isRemarkOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[85] flex items-center justify-center bg-black/30 px-6 backdrop-blur-sm"
+            onClick={() => setIsRemarkOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.94, y: 12 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.96, y: 12 }}
+              className="w-full rounded-[28px] bg-[#fffaf5] p-5 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-lg font-black text-[#2f261d]">设置备注</h3>
+              <p className="mt-1 text-xs font-bold text-[#8f7f6d]">给 {userName} 一个你更容易识别的名字。</p>
+              <input
+                value={remarkDraft}
+                onChange={(e) => setRemarkDraft(e.target.value)}
+                maxLength={16}
+                placeholder="输入备注名"
+                className="mt-5 h-12 w-full rounded-2xl bg-[#f8f1e8] px-4 text-sm font-black text-[#2f261d] outline-none"
+              />
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                <button onClick={() => setIsRemarkOpen(false)} className="h-11 rounded-2xl bg-white text-sm font-black text-[#8f7f6d] shadow-sm active:scale-95 transition-transform">取消</button>
+                <button onClick={saveRemark} className="h-11 rounded-2xl bg-[#2f261d] text-sm font-black text-white active:scale-95 transition-transform">保存</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isBlockConfirmOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[90] flex items-end bg-black/32 backdrop-blur-sm"
+            onClick={() => setIsBlockConfirmOpen(false)}
+          >
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              className="w-full rounded-t-[32px] bg-[#fffaf5] px-6 pb-8 pt-6 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-rose-50 text-rose-500">
+                <AlertTriangle size={26} />
+              </div>
+              <h3 className="text-center text-xl font-black text-[#2f261d]">确认拉黑 {remarkName || userName}？</h3>
+              <p className="mx-auto mt-3 max-w-[280px] text-center text-xs font-bold leading-relaxed text-[#8f7f6d]">
+                拉黑后，对方将无法与你私信互动，也会进入设置中的黑名单列表。
+              </p>
+              <div className="mt-6 grid grid-cols-2 gap-3">
+                <button onClick={() => setIsBlockConfirmOpen(false)} className="h-12 rounded-2xl bg-white text-sm font-black text-[#8f7f6d] shadow-sm active:scale-95 transition-transform">再想想</button>
+                <button onClick={handleBlock} className="h-12 rounded-2xl bg-rose-500 text-sm font-black text-white active:scale-95 transition-transform">确认拉黑</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -5680,12 +6122,12 @@ const RelationInviteScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
         {/* Connection Ritual Header */}
         <section className="text-center space-y-4 pt-4">
           <div className="relative inline-block">
-            <motion.div 
+            <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
               className="absolute inset-[-20px] border border-dashed border-white/10 rounded-full"
             />
-            <motion.div 
+            <motion.div
               animate={{ rotate: -360 }}
               transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
               className="absolute inset-[-10px] border border-dashed border-gold/20 rounded-full"
@@ -5694,7 +6136,7 @@ const RelationInviteScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
               <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Wesley" className="w-full h-full object-cover rounded-full" alt="Me" />
               <div className="absolute inset-0 bg-gradient-to-t from-dark/60 to-transparent"></div>
             </div>
-            <motion.div 
+            <motion.div
               initial={{ x: 40, opacity: 0 }}
               animate={{ x: 60, opacity: 1 }}
               className="absolute top-1/2 -right-8 flex gap-1 items-center"
@@ -5721,7 +6163,7 @@ const RelationInviteScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
             <h4 className="text-[10px] font-black uppercase text-white/30 tracking-widest">选择共鸣类型</h4>
             <span className="text-[10px] font-black text-gold/40 italic">Select Frequency</span>
           </div>
-          
+
           <div className="flex gap-4 overflow-x-auto no-scrollbar py-2 -mx-6 px-6">
             {relations.map(item => (
               <motion.div
@@ -5729,29 +6171,29 @@ const RelationInviteScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedType(item.title)}
                 className={`relative min-w-[140px] aspect-[4/5] p-5 rounded-[32px] border transition-all duration-300 flex flex-col justify-between overflow-hidden group cursor-pointer ${
-                  selectedType === item.title 
-                  ? 'bg-white/10 border-white/20' 
+                  selectedType === item.title
+                  ? 'bg-white/10 border-white/20'
                   : 'bg-white/5 border-white/5'
                 }`}
               >
                 {selectedType === item.title && (
-                  <motion.div 
+                  <motion.div
                     layoutId="rel-bg"
                     className="absolute inset-0 opacity-20"
                     style={{ backgroundColor: item.color, filter: 'blur(40px)' }}
                   />
                 )}
-                
+
                 <div className="relative z-10 flex flex-col h-full justify-between">
                   <div>
                     <span className="text-[8px] font-black uppercase tracking-widest text-white/30">{item.badge}</span>
                     <h4 className={`font-black text-lg transition-colors ${selectedType === item.title ? 'text-white' : 'text-white/40'}`}>{item.title}</h4>
                   </div>
-                  
+
                   <div className="flex flex-col gap-2">
                     <div className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${
-                      selectedType === item.title 
-                      ? 'bg-white text-dark scale-110 shadow-[0_0_20px_rgba(255,255,255,0.3)]' 
+                      selectedType === item.title
+                      ? 'bg-white text-dark scale-110 shadow-[0_0_20px_rgba(255,255,255,0.3)]'
                       : 'bg-white/5 text-white/20'
                     }`}>
                       <item.icon size={20} fill={selectedType === item.title ? "currentColor" : "none"} />
@@ -5764,7 +6206,7 @@ const RelationInviteScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
 
                 {/* Animated Ring if selected */}
                 {selectedType === item.title && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 0.15, scale: 1.5 }}
                     className="absolute bottom-[-20%] right-[-20%] w-32 h-32 border border-white rounded-full"
@@ -5781,12 +6223,12 @@ const RelationInviteScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
             <h4 className="text-[10px] font-black uppercase text-white/30 tracking-widest uppercase">定位共鸣坐标</h4>
             <span className="text-[10px] font-black text-gold/40 italic">Target DR ID</span>
           </div>
-          
+
           <div className="relative group">
             <div className="absolute inset-y-0 left-5 flex items-center text-white/20">
               <Search size={18} />
             </div>
-            <input 
+            <input
               value={targetId}
               onChange={(e) => {
                 setTargetId(e.target.value);
@@ -5795,12 +6237,12 @@ const RelationInviteScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
                   setTimeout(() => setIsSearching(false), 800);
                 }
               }}
-              className="w-full h-16 bg-white/5 rounded-[24px] pl-14 pr-14 font-bold border border-white/5 focus:border-white/20 focus:bg-white/10 transition-all outline-none text-white tracking-widest placeholder:text-white/10" 
-              placeholder="ENTER DR ID..." 
+              className="w-full h-16 bg-white/5 rounded-[24px] pl-14 pr-14 font-bold border border-white/5 focus:border-white/20 focus:bg-white/10 transition-all outline-none text-white tracking-widest placeholder:text-white/10"
+              placeholder="ENTER DR ID..."
             />
             <div className="absolute inset-y-0 right-5 flex items-center">
               {isSearching ? (
-                <motion.div 
+                <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                   className="w-5 h-5 border-2 border-gold border-t-transparent rounded-full"
@@ -5813,7 +6255,7 @@ const RelationInviteScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
             </div>
           </div>
           {targetId.length > 5 && !isSearching && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5"
@@ -5829,14 +6271,14 @@ const RelationInviteScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
       </main>
 
       <footer className="p-8 pt-0 relative z-20">
-         <button 
-           onClick={() => setScreen('relation-sent')} 
+         <button
+           onClick={() => setScreen('relation-sent')}
            disabled={!targetId}
            className="w-full h-16 group relative overflow-hidden rounded-[24px] disabled:opacity-30 transition-all active:scale-95"
          >
             <div className="absolute inset-0 bg-white group-hover:bg-gold transition-colors duration-500"></div>
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-[radial-gradient(circle_at_center,white_0%,transparent_70%)]"></div>
-            
+
             <div className="relative z-10 flex items-center justify-center gap-3 text-dark">
               <div className="flex flex-col items-center">
                 <span className="text-xs font-black uppercase tracking-[0.2em] leading-none mb-1">Star Trail Ring</span>
@@ -5852,7 +6294,7 @@ const RelationInviteScreen = ({ setScreen }: { setScreen: (s: Screen) => void })
               className="absolute top-0 bottom-0 w-24 bg-gradient-to-r from-transparent via-white/50 to-transparent skew-x-12"
             />
          </button>
-         
+
          <p className="text-center mt-6 text-[9px] font-black text-white/20 uppercase tracking-[0.3em]">
            Consumed 520 Diamonds for the Ritual
          </p>
@@ -5874,7 +6316,7 @@ const RelationSentScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) =
           animate={{ opacity: [0, 1, 0], y: -500 - Math.random() * 500 }}
           transition={{ duration: 2 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 5 }}
           className="absolute w-0.5 h-0.5 bg-white rounded-full bg-gold"
-          style={{ 
+          style={{
             left: `${Math.random() * 100}%`,
             top: '110%'
           }}
@@ -5882,18 +6324,18 @@ const RelationSentScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) =
       ))}
 
       <div className="relative mb-12">
-        <motion.div 
+        <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
           className="absolute inset-[-40px] border border-dashed border-gold/10 rounded-full"
         />
-        <motion.div 
+        <motion.div
           animate={{ rotate: -360 }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           className="absolute inset-[-20px] border border-dashed border-white/10 rounded-full"
         />
-        
-        <motion.div 
+
+        <motion.div
           initial={{ scale: 0, scaleY: 0.5 }}
           animate={{ scale: 1, scaleY: 1 }}
           transition={{ type: "spring", damping: 12 }}
@@ -5905,7 +6347,7 @@ const RelationSentScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) =
           >
             <Sparkles size={56} className="text-dark" strokeWidth={2.5} />
           </motion.div>
-          
+
           <motion.div
              animate={{ height: ['0%', '100%', '0%'], opacity: [0, 0.5, 0] }}
              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
@@ -5914,7 +6356,7 @@ const RelationSentScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) =
         </motion.div>
       </div>
 
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
@@ -5929,11 +6371,11 @@ const RelationSentScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) =
         </p>
       </motion.div>
 
-      <motion.button 
+      <motion.button
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        onClick={() => setScreen('home')} 
+        onClick={() => setScreen('home')}
         className="w-full mt-12 group h-16 bg-white/5 border border-white/10 rounded-[28px] relative overflow-hidden flex items-center justify-center active:scale-95 transition-all"
       >
         <div className="absolute inset-0 bg-white translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500"></div>
@@ -5944,9 +6386,35 @@ const RelationSentScreen = ({ setScreen }: { setScreen: (s: Screen) => void }) =
 };
 
 // --- User Profile Screen (Public) ---
-const UserProfileScreen = ({ setScreen, userName, prevScreen, showToast, setInitialNetworkTab }: { setScreen: (s: Screen) => void, userName: string, prevScreen: Screen, showToast: (m: string) => void, setInitialNetworkTab: (tab: 'followers' | 'following' | 'friends') => void }) => {
-  const [isFollowed, setIsFollowed] = useState(false);
+const UserProfileScreen = ({
+  setScreen,
+  userName,
+  prevScreen,
+  showToast,
+  setInitialNetworkTab,
+  userRemarks,
+  setUserRemarks,
+  blockedUserNames,
+  blockUser,
+  setReportTargetName,
+}: {
+  setScreen: (s: Screen) => void,
+  userName: string,
+  prevScreen: Screen,
+  showToast: (m: string) => void,
+  setInitialNetworkTab: (tab: 'followers' | 'following' | 'friends') => void,
+  userRemarks: Record<string, string>,
+  setUserRemarks: React.Dispatch<React.SetStateAction<Record<string, string>>>,
+  blockedUserNames: Set<string>,
+  blockUser: (name: string) => void,
+  setReportTargetName: (name: string) => void,
+}) => {
+  const [isFollowed, setIsFollowed] = useState(true);
   const [filter, setFilter] = useState('全部');
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isBlockConfirmOpen, setIsBlockConfirmOpen] = useState(false);
+  const [isRemarkOpen, setIsRemarkOpen] = useState(false);
+  const [remarkDraft, setRemarkDraft] = useState(userRemarks[userName] || '');
 
   const filterOptions = ['全部', '我发起的', '参与共创', '待成圈'];
 
@@ -6007,6 +6475,48 @@ const UserProfileScreen = ({ setScreen, userName, prevScreen, showToast, setInit
   const displayName = `迪儿${userCode}`;
   const displayId = `@dear${userCode}`;
   const ipLocation = getUserIpLocation(userName);
+  const remarkName = userRemarks[userName];
+  const isBlocked = blockedUserNames.has(userName);
+  const closeMore = () => setIsMoreOpen(false);
+
+  const saveRemark = () => {
+    const nextRemark = remarkDraft.trim();
+    setUserRemarks(prev => {
+      const next = { ...prev };
+      if (nextRemark) next[userName] = nextRemark;
+      else delete next[userName];
+      return next;
+    });
+    setIsRemarkOpen(false);
+    showToast(nextRemark ? '备注已保存' : '备注已清除');
+  };
+
+  const handleUnfollow = () => {
+    setIsFollowed(false);
+    closeMore();
+    showToast('已取消关注');
+  };
+
+  const handleFollowToggleFromMenu = () => {
+    setIsFollowed(prev => {
+      const next = !prev;
+      showToast(next ? '已关注' : '已取消关注');
+      return next;
+    });
+    closeMore();
+  };
+
+  const handleReport = () => {
+    setReportTargetName(userName);
+    closeMore();
+    setScreen('report-user');
+  };
+
+  const handleBlock = () => {
+    blockUser(userName);
+    setIsBlockConfirmOpen(false);
+    closeMore();
+  };
 
   return (
     <div className="flex flex-col h-full bg-[radial-gradient(circle_at_top,#fffaf4_0%,#f7f2ea_42%,#f2ebe1_100%)] pt-8 text-[#2f261d]">
@@ -6015,8 +6525,8 @@ const UserProfileScreen = ({ setScreen, userName, prevScreen, showToast, setInit
           <ArrowLeft size={20} />
         </button>
         <h2 className="font-bold text-[#2f261d] text-lg tracking-tight">用户详情</h2>
-        <button onClick={() => showToast('已生成个人主页分享卡片。')} className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white/82 text-[#4f3d2d] shadow-sm active:scale-95 transition-transform">
-          <CornerUpRight size={20} />
+        <button onClick={() => setIsMoreOpen(true)} className="w-10 h-10 rounded-2xl flex items-center justify-center bg-white/82 text-[#4f3d2d] shadow-sm active:scale-95 transition-transform" aria-label="更多操作">
+          <MoreHorizontal size={20} />
         </button>
       </header>
 
@@ -6031,17 +6541,19 @@ const UserProfileScreen = ({ setScreen, userName, prevScreen, showToast, setInit
             </div>
 
             <div className="flex-1 min-w-0 text-left">
-              <h1 className="text-[24px] font-black text-[#2f261d] tracking-tight leading-tight">{displayName}</h1>
+              <h1 className="text-[24px] font-black text-[#2f261d] tracking-tight leading-tight">{remarkName || displayName}</h1>
               <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
                 <p className="text-[#7d6f61]">{displayId}</p>
+                {remarkName && <span className="text-[11px] font-bold text-[#b0a08e]">原名：{displayName}</span>}
                 <span className="text-[11px] font-bold text-[#b0a08e]">IP：{ipLocation}</span>
+                {isBlocked && <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-black text-rose-500">已拉黑</span>}
               </div>
               <p className="mt-2.5 text-[#8f7f6d] text-sm leading-relaxed">{publicProfile.description}</p>
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-2 mt-6">
-            <button 
+            <button
               onClick={() => { setInitialNetworkTab('followers'); setScreen('network-list'); }}
               className="text-center active:scale-95 transition-transform"
             >
@@ -6052,7 +6564,7 @@ const UserProfileScreen = ({ setScreen, userName, prevScreen, showToast, setInit
               <p className="text-[20px] font-black text-[#2f261d]">86</p>
               <p className="text-[10px] text-[#a79584] font-bold">共创</p>
             </div>
-            <button 
+            <button
               onClick={() => { setInitialNetworkTab('following'); setScreen('network-list'); }}
               className="text-center active:scale-95 transition-transform"
             >
@@ -6073,18 +6585,26 @@ const UserProfileScreen = ({ setScreen, userName, prevScreen, showToast, setInit
           )}
 
           <div className="flex gap-2.5 mt-5">
-            <button 
-              onClick={() => setIsFollowed(!isFollowed)}
+            <button
+              onClick={() => {
+                setIsFollowed(!isFollowed);
+                if (!isFollowed) showToast('已关注');
+              }}
+              disabled={isBlocked}
               className={`flex-1 h-12 rounded-[18px] font-black text-xs transition-all flex items-center justify-center gap-2 active:scale-95 ${
-                isFollowed 
-                ? 'bg-white/70 text-[#8f7f6d] shadow-sm' 
+                isBlocked
+                ? 'bg-white/46 text-[#c2b4a4] shadow-sm'
+                :
+                isFollowed
+                ? 'bg-white/70 text-[#8f7f6d] shadow-sm'
                 : 'bg-[#2f261d] text-white shadow-[0_14px_28px_rgba(47,38,29,0.14)]'
               }`}
             >
-              {isFollowed ? '已关注' : '关注 TA'}
+              {isBlocked ? '已拉黑' : isFollowed ? '已关注' : '关注 TA'}
             </button>
-            <button 
+            <button
               onClick={() => setScreen('dm')}
+              disabled={isBlocked}
               className="flex-1 h-12 rounded-[18px] bg-white/76 text-[#2f261d] font-black text-xs active:scale-95 transition-transform flex items-center justify-center gap-2 shadow-sm"
             >
               <MessageCircle size={14} /> 发送私信
@@ -6101,7 +6621,7 @@ const UserProfileScreen = ({ setScreen, userName, prevScreen, showToast, setInit
                 </h4>
                 <p className="mt-1 text-[11px] text-[#8f7f6d] font-bold">目前还没有与 TA 建立专属关系标记</p>
               </div>
-              <button 
+              <button
                 onClick={() => setScreen('relation-invite')}
                 className="h-9 px-4 bg-[#FE2C55] text-white rounded-full text-[10px] font-black active:scale-95 transition-transform shrink-0"
               >
@@ -6121,8 +6641,8 @@ const UserProfileScreen = ({ setScreen, userName, prevScreen, showToast, setInit
                   key={opt}
                   onClick={() => setFilter(opt)}
                   className={`px-4 py-2 rounded-full text-[10px] font-black transition-all whitespace-nowrap ${
-                    filter === opt 
-                    ? 'bg-[#2f261d] text-white shadow-sm' 
+                    filter === opt
+                    ? 'bg-[#2f261d] text-white shadow-sm'
                     : 'bg-white/82 text-[#8f7f6d]'
                   }`}
                 >
@@ -6161,6 +6681,122 @@ const UserProfileScreen = ({ setScreen, userName, prevScreen, showToast, setInit
           </div>
         </section>
       </main>
+
+      <AnimatePresence>
+        {isMoreOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[90] flex flex-col justify-end bg-black/28 backdrop-blur-sm"
+            onClick={closeMore}
+          >
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 260 }}
+              className="rounded-t-[32px] bg-[#fffaf5] px-5 pb-8 pt-3 shadow-[0_-18px_50px_rgba(73,55,39,0.16)]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#eadfce]" />
+              <div className="mb-4 flex items-center gap-3">
+                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${displayId}`} alt="" className="h-11 w-11 rounded-2xl bg-[#f6ede3]" />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-black text-[#2f261d]">{remarkName || displayName}</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#a79584]">{displayId}</p>
+                </div>
+              </div>
+              {[
+                { label: '发私信', icon: MessageCircle, action: () => { closeMore(); setScreen('dm'); } },
+                { label: '设置备注', icon: Pencil, action: () => { closeMore(); setRemarkDraft(userRemarks[userName] || ''); setIsRemarkOpen(true); } },
+                { label: isFollowed ? '取消关注' : '关注', icon: UserPlus, action: handleFollowToggleFromMenu },
+                { label: '举报', icon: AlertTriangle, action: handleReport, danger: true },
+                { label: '拉黑', icon: Lock, action: () => setIsBlockConfirmOpen(true), danger: true },
+              ].map(item => (
+                <button
+                  key={item.label}
+                  onClick={item.action}
+                  className={`flex w-full items-center gap-3 rounded-[20px] px-4 py-3.5 text-left active:bg-[#f6ede3] transition-colors ${
+                    item.danger ? 'text-rose-500' : 'text-[#2f261d]'
+                  }`}
+                >
+                  <span className={`flex h-9 w-9 items-center justify-center rounded-xl ${item.danger ? 'bg-rose-50' : 'bg-[#f6ede3]'}`}>
+                    <item.icon size={17} />
+                  </span>
+                  <span className="text-sm font-black">{item.label}</span>
+                </button>
+              ))}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isRemarkOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[95] flex items-center justify-center bg-black/30 px-6 backdrop-blur-sm"
+            onClick={() => setIsRemarkOpen(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.94, y: 12 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.96, y: 12 }}
+              className="w-full rounded-[28px] bg-[#fffaf5] p-5 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-lg font-black text-[#2f261d]">设置备注</h3>
+              <p className="mt-1 text-xs font-bold text-[#8f7f6d]">给 {displayName} 一个你更容易识别的名字。</p>
+              <input
+                value={remarkDraft}
+                onChange={(e) => setRemarkDraft(e.target.value)}
+                maxLength={16}
+                placeholder="输入备注名"
+                className="mt-5 h-12 w-full rounded-2xl bg-[#f8f1e8] px-4 text-sm font-black text-[#2f261d] outline-none"
+              />
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                <button onClick={() => setIsRemarkOpen(false)} className="h-11 rounded-2xl bg-white text-sm font-black text-[#8f7f6d] shadow-sm active:scale-95 transition-transform">取消</button>
+                <button onClick={saveRemark} className="h-11 rounded-2xl bg-[#2f261d] text-sm font-black text-white active:scale-95 transition-transform">保存</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isBlockConfirmOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-[100] flex items-end bg-black/32 backdrop-blur-sm"
+            onClick={() => setIsBlockConfirmOpen(false)}
+          >
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              className="w-full rounded-t-[32px] bg-[#fffaf5] px-6 pb-8 pt-6 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-rose-50 text-rose-500">
+                <AlertTriangle size={26} />
+              </div>
+              <h3 className="text-center text-xl font-black text-[#2f261d]">确认拉黑 {remarkName || displayName}？</h3>
+              <p className="mx-auto mt-3 max-w-[280px] text-center text-xs font-bold leading-relaxed text-[#8f7f6d]">
+                拉黑后，对方将无法与你私信互动，也会进入设置中的黑名单列表。
+              </p>
+              <div className="mt-6 grid grid-cols-2 gap-3">
+                <button onClick={() => setIsBlockConfirmOpen(false)} className="h-12 rounded-2xl bg-white text-sm font-black text-[#8f7f6d] shadow-sm active:scale-95 transition-transform">再想想</button>
+                <button onClick={handleBlock} className="h-12 rounded-2xl bg-rose-500 text-sm font-black text-white active:scale-95 transition-transform">确认拉黑</button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
@@ -6297,12 +6933,12 @@ const RelationReviewScreen = ({ setScreen, showToast }: { setScreen: (s: Screen)
       {/* Immersive Space Background */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-20%] right-[-10%] w-full h-full opacity-40 blur-[130px] bg-gradient-to-bl from-gold/30 via-indigo-600/10 to-transparent"></div>
-        <motion.div 
+        <motion.div
           animate={{ scale: [1, 1.1, 1], opacity: [0.1, 0.3, 0.1] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-0" 
-          style={{ 
-            backgroundImage: 'radial-gradient(circle at 70% 20%, rgba(255,215,0,0.15) 0%, transparent 60%)' 
+          className="absolute inset-0"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 70% 20%, rgba(255,215,0,0.15) 0%, transparent 60%)'
           }}
         ></motion.div>
       </div>
@@ -6322,7 +6958,7 @@ const RelationReviewScreen = ({ setScreen, showToast }: { setScreen: (s: Screen)
         {/* Transmission Source Header */}
         <section className="space-y-6 text-center">
           <div className="relative inline-block">
-             <motion.div 
+             <motion.div
                animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0, 0.5] }}
                transition={{ duration: 3, repeat: Infinity, ease: "easeOut" }}
                className="absolute inset-[-15px] border border-gold/30 rounded-full"
@@ -6373,11 +7009,11 @@ const RelationReviewScreen = ({ setScreen, showToast }: { setScreen: (s: Screen)
       </main>
 
       <footer className="p-8 pb-12 relative z-20 space-y-4">
-         <button 
+         <button
            onClick={() => {
              showToast('恭喜！星轨轨道已对接成功。');
              setTimeout(() => setScreen('me'), 1000);
-           }} 
+           }}
            className="w-full h-16 bg-white rounded-[24px] font-black uppercase text-xs text-dark shadow-[0_20px_50px_rgba(255,255,255,0.2)] active:scale-95 transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
          >
             <div className="absolute inset-0 bg-gold translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500"></div>
@@ -6385,9 +7021,9 @@ const RelationReviewScreen = ({ setScreen, showToast }: { setScreen: (s: Screen)
               同意并开启共鸣 <Zap size={14} fill="currentColor" />
             </span>
          </button>
-         
-         <button 
-           onClick={() => setScreen('messages')} 
+
+         <button
+           onClick={() => setScreen('messages')}
            className="w-full h-14 bg-white/5 border border-white/10 rounded-[24px] font-black uppercase text-[10px] tracking-[0.2em] text-white/40 active:scale-95 transition-all"
          >
             暂时保持独立轨道
