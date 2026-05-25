@@ -6231,21 +6231,6 @@ const PersonalProfileScreen = ({ setScreen, profile, setProfile, showToast }: {
               </label>
            </div>
 
-           <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: '参与共创', val: '32', icon: Flame },
-                { label: '获得热度', val: '1.2k', icon: Heart },
-              ].map(stat => (
-                <div key={stat.label} className={`p-5 space-y-3 ${lightSurfaceCard}`}>
-                   <stat.icon size={16} className="text-[#c0b09d]" />
-                   <div>
-                      <p className="text-2xl font-bold leading-none text-[#2f261d]">{stat.val}</p>
-                      <p className="text-[10px] font-black uppercase text-[#8f7f6d] mt-1 tracking-widest">{stat.label}</p>
-                   </div>
-                </div>
-              ))}
-           </div>
-
            <div className="p-6 bg-white/82 rounded-[32px] space-y-6 border border-[#eadfce] shadow-2xl">
               <div className="flex justify-between items-center">
                  <h4 className="text-[10px] font-black uppercase text-[#8f7f6d] tracking-widest ml-1">已绑定关系</h4>
